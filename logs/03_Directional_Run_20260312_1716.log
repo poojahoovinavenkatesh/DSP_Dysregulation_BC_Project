@@ -1,0 +1,1356 @@
+=============================================================
+ 05a_directional_classifier.R
+ Start: 2026-03-12 17:16:33.630732 
+=============================================================
+
+[INIT] Loading locked diagnostic engine...
+  Genes       : CDKN3, DUSP1, DUSP6, EPM2A, TNS1, PTP4A3, CDC14B, PTP4A2, STYXL1 
+  Up in Tumour: CDKN3, PTP4A2, PTP4A3, STYXL1 
+  Down        : TNS1, DUSP6, CDC14B, EPM2A, DUSP1 
+
+  Loading TCGA-BRCA...
+  TCGA-BRCA: 1219 samples | Tumour: 1106 | Normal: 113 
+
+  Directional Score range : -17.402 to 13.093 
+  Tumour mean: 1.449 | Normal mean: -11.73 
+
+─────────────────────────────────────────────────────────────
+SECTION A: Directional profile
+─────────────────────────────────────────────────────────────
+
+  Directional profile (TCGA-BRCA training — pipeline-derived only):
+
+  CDKN3           ↑ Tumor  Normal=1.798  Tumour=4.114  Log2FC=+1.194  FDR=7.94e-61  SHAP=High
+  CDC14B          ↓ Tumor  Normal=3.856  Tumour=2.234  Log2FC=-0.787  FDR=1.06e-57  SHAP=Medium
+  TNS1            ↓ Tumor  Normal=7.599  Tumour=4.869  Log2FC=-0.642  FDR=2.47e-62  SHAP=High
+  EPM2A           ↓ Tumor  Normal=1.889  Tumour=1.282  Log2FC=-0.559  FDR=6.96e-42  SHAP=Medium
+  DUSP6           ↓ Tumor  Normal=7.059  Tumour=5.355  Log2FC=-0.399  FDR=1.52e-47  SHAP=High
+  DUSP1           ↓ Tumor  Normal=9.770  Tumour=7.509  Log2FC=-0.380  FDR=9.91e-47  SHAP=Low
+  PTP4A3          ↑ Tumor  Normal=4.344  Tumour=5.209  Log2FC=+0.262  FDR=2.29e-28  SHAP=Low
+  STYXL1          ↑ Tumor  Normal=5.178  Tumour=5.936  Log2FC=+0.197  FDR=9.93e-32  SHAP=Low
+  PTP4A2          ↑ Tumor  Normal=7.123  Tumour=7.439  Log2FC=+0.063  FDR=1.62e-08  SHAP=Medium
+
+  [SAVED] A_directional_profile.csv
+
+  [SAVED] Fig_05a_A1_Profile (PNG 300dpi + TIFF 600dpi + PDF)
+─────────────────────────────────────────────────────────────
+SECTION B: Classifier comparison (XGBoost vs Directional vs Hybrid)
+─────────────────────────────────────────────────────────────
+
+  XGBoost AUC     : 0.9997 [0.9992–1.0000]
+  Directional AUC : 0.9963 [0.9940–0.9987]  DeLong p vs XGB: 0.0041
+  Fitting 5-fold CV hybrid classifier...
+  Hybrid AUC      : 0.9992 [0.9976–1.0000]  DeLong p vs XGB: 0.3188
+
+  [SAVED] B_classifier_comparison.csv
+          Classifier    AUC AUC_CI_Lo AUC_CI_Hi Sensitivity Specificity DeLong_p_vs_XGB
+1 XGBoost (Bayesian) 0.9997    0.9992    1.0000      0.9973      1.0000              NA
+2  Directional Score 0.9963    0.9940    0.9987      0.9774      0.9646          0.0041
+3   Hybrid (XGB+Dir) 0.9992    0.9976    1.0000      0.9973      1.0000          0.3188
+  [SAVED] B_sample_scores.csv  ← input for 05b_subtype_specificity.R
+
+  [SAVED] Fig_05a_B1_Triple_ROC (PNG 300dpi + TIFF 600dpi + PDF)
+  [SAVED] Fig_05a_B2_ScoreViolin (PNG 300dpi + TIFF 600dpi + PDF)
+
+─────────────────────────────────────────────────────────────
+SECTION D: Organ specificity
+─────────────────────────────────────────────────────────────
+
+  Loading Lung ...
+  Loading Kidney ...
+  Loading Colon ...
+  Loading Glioblastoma ...
+  Loading Prostate ...
+  Loading Melanoma ...
+  Breast vs Lung            Dir=0.6658  XGB=0.7511
+  Breast vs Kidney          Dir=0.9080  XGB=0.8889
+  Breast vs Colon           Dir=0.3674  XGB=0.5521
+  Breast vs Glioblastoma    Dir=0.6620  XGB=0.7378
+  Breast vs Prostate        Dir=0.7008  XGB=0.8402
+  Breast vs Melanoma        Dir=0.5038  XGB=0.7566
+  [SAVED] D_orgspec_AUC.csv
+
+  [SAVED] Fig_05a_D1_OrgSpec_Forest (PNG 300dpi + TIFF 600dpi + PDF)
+
+─────────────────────────────────────────────────────────────
+SECTION E: Clinical relevance (threshold analysis)
+─────────────────────────────────────────────────────────────
+
+  [SAVED] E_clinical_threshold_table.csv
+  [SAVED] E_best_threshold_summary.csv
+
+  ── Youden-optimal thresholds ──
+# A tibble: 8 × 10
+  Comparison   Threshold Sensitivity Specificity   PPV    NPV LR_Positive LR_Negative Youden_J   MCC
+  <chr>            <dbl>       <dbl>       <dbl> <dbl>  <dbl>       <dbl>       <dbl>    <dbl> <dbl>
+1 Breast_Tumo…    -5.44       0.965        0.965 0.996 0.736       27.3        0.0366   0.929     NA
+2 Breast_vs_A…    -2.05       0.744        0.514 0.448 0.791        1.53       0.498    0.258     NA
+3 Breast_vs_C…     9.10       0.0189       0.977 0.676 0.278        0.808      1.00    -0.0045    NA
+4 Breast_vs_G…     2.06       0.413        0.930 0.979 0.169        5.89       0.632    0.343     NA
+5 Breast_vs_K…    -4.58       0.856        0.896 0.949 0.733        8.21       0.160    0.752     NA
+6 Breast_vs_L…     0.340      0.560        0.724 0.824 0.416        2.03       0.608    0.284     NA
+7 Breast_vs_M…     4.07       0.230        0.874 0.956 0.0875       1.83       0.881    0.104     NA
+8 Breast_vs_P…    -0.475      0.625        0.719 0.844 0.441        2.22       0.522    0.344     NA
+  [SAVED] Fig_05a_E1_Clinical_Thresholds (PNG 300dpi + TIFF 600dpi + PDF)
+  [SAVED] Fig_05a_E2_LikelihoodRatios (PNG 300dpi + TIFF 600dpi + PDF)
+
+  [SAVED] 05a_Directional_Results.rds
+
+=============================================================
+ 05a_directional_classifier.R  COMPLETE
+ Runtime: 0.8 mins
+
+ SAVED ARTEFACTS:
+  Tables  : A_directional_profile.csv
+            B_classifier_comparison.csv
+            B_sample_scores.csv          ← KEY INPUT for 05b
+            D_orgspec_AUC.csv
+            E_clinical_threshold_table.csv
+            E_best_threshold_summary.csv
+            05a_Directional_Results.rds
+  Figures : Fig_05a_A1_Profile.*
+            Fig_05a_B1_Triple_ROC.*
+            Fig_05a_B2_ScoreViolin.*
+            Fig_05a_D1_OrgSpec_Forest.*
+            Fig_05a_E1_Clinical_Thresholds.*
+            Fig_05a_E2_LikelihoodRatios.*
+            (PNG 300dpi + TIFF 600dpi + PDF)
+  Logs    : 05a_Directional_Run_[timestamp].log
+            05a_session_info.txt
+=============================================================
+           used  (Mb) gc trigger   (Mb)  max used   (Mb)
+Ncells  9752191 520.9   29222430 1560.7  29222430 1560.7
+Vcells 19765349 150.8  254066251 1938.4 317574655 2423.0
+$out
+[1] TRUE
+
+$figures
+[1] TRUE
+
+$logs
+[1] TRUE
+
+=============================================================
+ 05b_subtype_specificity.R
+ Start: 2026-03-12 17:24:49.783 
+=============================================================
+
+[1/5] Loading scores from 05a...
+  Loaded 1219 samples
+  Tumour: 1106 | Normal: 113 
+
+[2/5] Fetching PAM50 subtype labels...
+  Cache not found — downloading via TCGAbiolinks...
+  Downloaded 1218 BRCA records
+
+ Basal   Her2   LumA   LumB Normal 
+   193     82    581    219    143 
+  [SAVED] Cache: data/TCGA_BRCA_PAM50_Subtypes.csv 
+
+[3/5] Merging and harmonising subtypes...
+  Raw subtype counts (before exclusion):
+
+     Basal       HER2       LumA       LumB NormalLike 
+       193         82        581        219        143 
+
+  [EXCLUSION] Normal-like tumours excluded: 143 records
+  Reason: stromal contamination artefact — not a true molecular subtype.
+  This prevents low-purity biopsies from being miscoded as 'low aggression'.
+  Matched-normal tissue (TCGA code-11) is RETAINED as the Normal reference.
+
+  ── Matched dataset summary ──
+  Tumour samples with PAM50 call   : 1066 (96.4% of 1106) 
+  Tumours dropped (no annotation)  : 40 
+  Normal tissue samples retained   : 113 
+
+  Final subtype distribution:
+
+Normal   LumA   LumB   HER2  Basal 
+   113    572    217     82    195 
+  [SAVED] PAM50_merged_scores.csv
+
+[4/5] Statistical analysis...
+
+  Kruskal-Wallis XGBoost      : H=381.131, df=4, p=<0.001
+  Kruskal-Wallis Dir Score    : H=490.727, df=4, p=<0.001
+
+  [SAVED] PAM50_pairwise_wilcoxon.csv
+  Directional Score — significant pairwise comparisons (BH-FDR < 0.05):
+    Normal vs LumA: FDR=0.0000
+    Normal vs LumB: FDR=0.0000
+    Normal vs HER2: FDR=0.0000
+    Normal vs Basal: FDR=0.0000
+    LumA vs LumB: FDR=0.0000
+    LumA vs HER2: FDR=0.0000
+    LumA vs Basal: FDR=0.0000
+    LumB vs HER2: FDR=0.0000
+    LumB vs Basal: FDR=0.0039
+    HER2 vs Basal: FDR=0.0010
+
+  Spearman ρ (XGBoost vs aggressiveness rank) : ρ=0.3027  p=<0.001
+  Spearman ρ (Dir Score vs aggressiveness rank): ρ=0.5535  p=<0.001
+
+  Interpretation:
+  A positive ρ close to 1.0 means the score increases monotonically with
+  clinical aggressiveness (Normal → Basal), supporting prognostic utility.
+
+  [SAVED] PAM50_score_summary.csv
+
+# A tibble: 5 × 8
+  SubtypeFinal     N Mean_XGB SD_XGB Median_XGB Mean_Dir SD_Dir Median_Dir
+  <fct>        <int>    <dbl>  <dbl>      <dbl>    <dbl>  <dbl>      <dbl>
+1 Normal         113    0.018 0.0354     0.0046  -11.7     2.93    -11.8  
+2 LumA           572    0.979 0.076      0.998     0.148   3.50      0.007
+3 LumB           217    0.998 0.003      0.999     4.13    2.81      3.99 
+4 HER2            82    0.991 0.0253     0.997     1.80    2.94      1.43 
+5 Basal          195    0.994 0.0108     0.998     3.16    3.26      3.32 
+  ── ROC / AUC: each PAM50 subtype vs Normal ──
+
+  LumA   vs Normal  Dir AUC=0.9954 [0.9922-0.9987]  XGB AUC=1.0000 [0.9999-1.0000]  DeLong p=0.0061
+  LumB   vs Normal  Dir AUC=1.0000 [1.0000-1.0000]  XGB AUC=1.0000 [1.0000-1.0000]  DeLong p=1.0000
+  HER2   vs Normal  Dir AUC=0.9992 [0.9980-1.0000]  XGB AUC=1.0000 [1.0000-1.0000]  DeLong p=0.2523
+  Basal  vs Normal  Dir AUC=0.9999 [0.9996-1.0000]  XGB AUC=1.0000 [1.0000-1.0000]  DeLong p=0.3854
+
+  DeLong Basal vs LumA — Dir Score: p=0.0083  XGBoost: p=0.4797
+  [SAVED] PAM50_subtype_AUC_table.csv
+
+
+[5/5] Generating figures...
+  [SAVED] Fig_05b_1_PAM50_Violin (PNG 300dpi + TIFF 600dpi + PDF)
+  [SAVED] Fig_05b_2_Gradient (PNG 300dpi + TIFF 600dpi + PDF)
+  [SAVED] Fig_05b_3_PAM50_Counts (PNG 300dpi + TIFF 600dpi + PDF)
+  [SAVED] Fig_05b_4_Pairwise_FDR (PNG 300dpi + TIFF 600dpi + PDF)
+  [SAVED] Fig_05b_5_ROC_Dir_bySubtype (PNG 300dpi + TIFF 600dpi + PDF)
+  [SAVED] Fig_05b_6_ROC_XGB_bySubtype (PNG 300dpi + TIFF 600dpi + PDF)
+  [SAVED] Fig_05b_7_AUC_Forest (PNG 300dpi + TIFF 600dpi + PDF)
+  [SAVED] 05b_Subtype_Results.rds
+
+=============================================================
+ 05b_subtype_specificity.R  COMPLETE
+ Runtime: 93.16 mins
+
+ SAVED ARTEFACTS:
+  Tables  : PAM50_merged_scores.csv
+            PAM50_score_summary.csv        (mean ± SD per subtype)
+            PAM50_pairwise_wilcoxon.csv    (BH-FDR pairwise, both scores)
+            PAM50_subtype_AUC_table.csv    (AUC per subtype vs Normal, DeLong)
+            05b_Subtype_Results.rds
+  Figures : Fig_05b_1_PAM50_Violin.*
+            Fig_05b_2_Gradient.*
+            Fig_05b_3_Subtype_Counts.*
+            Fig_05b_4_Pairwise_FDR.*
+            Fig_05b_5_ROC_Dir_bySubtype.*  (Dir Score ROC per subtype)
+            Fig_05b_6_ROC_XGB_bySubtype.*  (XGB ROC per subtype)
+            Fig_05b_7_AUC_Forest.*         (AUC forest plot, both scores)
+            (PNG 300dpi + TIFF 600dpi + PDF)
+  Logs    : 05b_Subtype_Run_[timestamp].log
+            05b_session_info.txt
+
+ NORMAL-LIKE EXCLUSION AUDIT:
+  Records excluded: 143 
+  Reason: PAM50 Normal-like = stromal contamination artefact,
+          not a true molecular subtype. Standard TCGA practice.
+=============================================================
+           used  (Mb) gc trigger   (Mb)  max used   (Mb)
+Ncells 10034291 535.9   29222430 1560.7  29222430 1560.7
+Vcells 20344822 155.3  203253001 1550.7 317574655 2423.0
+$out
+[1] FALSE
+
+$figures
+[1] FALSE
+
+$logs
+[1] FALSE
+
+=============================================================
+ 05a_directional_classifier.R
+ Start: 2026-03-12 19:23:24.457433 
+=============================================================
+
+[INIT] Loading locked diagnostic engine...
+  Genes       : CDKN3, DUSP1, DUSP6, EPM2A, TNS1, PTP4A3, CDC14B, PTP4A2, STYXL1 
+  Up in Tumour: CDKN3, PTP4A2, PTP4A3, STYXL1 
+  Down        : TNS1, DUSP6, CDC14B, EPM2A, DUSP1 
+
+  Loading TCGA-BRCA...
+  TCGA-BRCA: 1219 samples | Tumour: 1106 | Normal: 113 
+
+  Directional Score range : -17.402 to 13.093 
+  Tumour mean: 1.449 | Normal mean: -11.73 
+
+─────────────────────────────────────────────────────────────
+SECTION A: Directional profile
+─────────────────────────────────────────────────────────────
+
+  Directional profile (TCGA-BRCA training — pipeline-derived only):
+
+  CDKN3           ↑ Tumor  Normal=1.798  Tumour=4.114  Log2FC=+1.194  FDR=7.94e-61  SHAP=High
+  CDC14B          ↓ Tumor  Normal=3.856  Tumour=2.234  Log2FC=-0.787  FDR=1.06e-57  SHAP=Medium
+  TNS1            ↓ Tumor  Normal=7.599  Tumour=4.869  Log2FC=-0.642  FDR=2.47e-62  SHAP=High
+  EPM2A           ↓ Tumor  Normal=1.889  Tumour=1.282  Log2FC=-0.559  FDR=6.96e-42  SHAP=Medium
+  DUSP6           ↓ Tumor  Normal=7.059  Tumour=5.355  Log2FC=-0.399  FDR=1.52e-47  SHAP=High
+  DUSP1           ↓ Tumor  Normal=9.770  Tumour=7.509  Log2FC=-0.380  FDR=9.91e-47  SHAP=Low
+  PTP4A3          ↑ Tumor  Normal=4.344  Tumour=5.209  Log2FC=+0.262  FDR=2.29e-28  SHAP=Low
+  STYXL1          ↑ Tumor  Normal=5.178  Tumour=5.936  Log2FC=+0.197  FDR=9.93e-32  SHAP=Low
+  PTP4A2          ↑ Tumor  Normal=7.123  Tumour=7.439  Log2FC=+0.063  FDR=1.62e-08  SHAP=Medium
+
+  [SAVED] A_directional_profile.csv
+
+  [SAVED] Fig_05a_A1_Profile (PNG 300dpi + TIFF 600dpi + PDF)
+─────────────────────────────────────────────────────────────
+SECTION B: Classifier comparison (XGBoost vs Directional vs Hybrid)
+─────────────────────────────────────────────────────────────
+
+  XGBoost AUC     : 0.9997 [0.9992–1.0000]
+  Directional AUC : 0.9963 [0.9940–0.9987]  DeLong p vs XGB: 0.0041
+  Fitting 5-fold CV hybrid classifier...
+  Hybrid AUC      : 0.9992 [0.9976–1.0000]  DeLong p vs XGB: 0.3188
+
+  [SAVED] B_classifier_comparison.csv
+          Classifier    AUC AUC_CI_Lo AUC_CI_Hi Sensitivity Specificity DeLong_p_vs_XGB
+1 XGBoost (Bayesian) 0.9997    0.9992    1.0000      0.9973      1.0000              NA
+2  Directional Score 0.9963    0.9940    0.9987      0.9774      0.9646          0.0041
+3   Hybrid (XGB+Dir) 0.9992    0.9976    1.0000      0.9973      1.0000          0.3188
+  [SAVED] B_sample_scores.csv  ← input for 05b_subtype_specificity.R
+
+  [SAVED] Fig_05a_B1_Triple_ROC (PNG 300dpi + TIFF 600dpi + PDF)
+  [SAVED] Fig_05a_B2_ScoreViolin (PNG 300dpi + TIFF 600dpi + PDF)
+
+─────────────────────────────────────────────────────────────
+SECTION D: Organ specificity
+─────────────────────────────────────────────────────────────
+
+  Loading Lung ...
+  Loading Kidney ...
+  Loading Colon ...
+  Loading Glioblastoma ...
+  Loading Prostate ...
+  Loading Melanoma ...
+  Breast vs Lung            Dir=0.6658  XGB=0.7511
+  Breast vs Kidney          Dir=0.9080  XGB=0.8889
+  Breast vs Colon           Dir=0.3674  XGB=0.5521
+  Breast vs Glioblastoma    Dir=0.6620  XGB=0.7378
+  Breast vs Prostate        Dir=0.7008  XGB=0.8402
+  Breast vs Melanoma        Dir=0.5038  XGB=0.7566
+  [SAVED] D_orgspec_AUC.csv
+
+  [SAVED] Fig_05a_D1_OrgSpec_Forest (PNG 300dpi + TIFF 600dpi + PDF)
+
+─────────────────────────────────────────────────────────────
+SECTION E: Clinical relevance (threshold analysis)
+─────────────────────────────────────────────────────────────
+
+  [SAVED] E_clinical_threshold_table.csv
+  [SAVED] E_best_threshold_summary.csv
+
+  ── Youden-optimal thresholds ──
+# A tibble: 8 × 10
+  Comparison   Threshold Sensitivity Specificity   PPV    NPV LR_Positive LR_Negative Youden_J   MCC
+  <chr>            <dbl>       <dbl>       <dbl> <dbl>  <dbl>       <dbl>       <dbl>    <dbl> <dbl>
+1 Breast_Tumo…    -5.44       0.965        0.965 0.996 0.736       27.3        0.0366   0.929     NA
+2 Breast_vs_A…    -2.05       0.744        0.514 0.448 0.791        1.53       0.498    0.258     NA
+3 Breast_vs_C…     9.10       0.0189       0.977 0.676 0.278        0.808      1.00    -0.0045    NA
+4 Breast_vs_G…     2.06       0.413        0.930 0.979 0.169        5.89       0.632    0.343     NA
+5 Breast_vs_K…    -4.58       0.856        0.896 0.949 0.733        8.21       0.160    0.752     NA
+6 Breast_vs_L…     0.340      0.560        0.724 0.824 0.416        2.03       0.608    0.284     NA
+7 Breast_vs_M…     4.07       0.230        0.874 0.956 0.0875       1.83       0.881    0.104     NA
+8 Breast_vs_P…    -0.475      0.625        0.719 0.844 0.441        2.22       0.522    0.344     NA
+  [SAVED] Fig_05a_E1_Clinical_Thresholds (PNG 300dpi + TIFF 600dpi + PDF)
+  [SAVED] Fig_05a_E2_LikelihoodRatios (PNG 300dpi + TIFF 600dpi + PDF)
+
+  [SAVED] 05a_Directional_Results.rds
+
+=============================================================
+ 05a_directional_classifier.R  COMPLETE
+ Runtime: 0.78 mins
+
+ SAVED ARTEFACTS:
+  Tables  : A_directional_profile.csv
+            B_classifier_comparison.csv
+            B_sample_scores.csv          ← KEY INPUT for 05b
+            D_orgspec_AUC.csv
+            E_clinical_threshold_table.csv
+            E_best_threshold_summary.csv
+            05a_Directional_Results.rds
+  Figures : Fig_05a_A1_Profile.*
+            Fig_05a_B1_Triple_ROC.*
+            Fig_05a_B2_ScoreViolin.*
+            Fig_05a_D1_OrgSpec_Forest.*
+            Fig_05a_E1_Clinical_Thresholds.*
+            Fig_05a_E2_LikelihoodRatios.*
+            (PNG 300dpi + TIFF 600dpi + PDF)
+  Logs    : 05a_Directional_Run_[timestamp].log
+            05a_session_info.txt
+=============================================================
+           used  (Mb) gc trigger   (Mb)
+Ncells 10037952 536.1   29222430 1560.7
+Vcells 20353265 155.3  236256402 1802.5
+        max used   (Mb)
+Ncells  29222430 1560.7
+Vcells 317574655 2423.0
+$out
+[1] FALSE
+
+$figures
+[1] FALSE
+
+$logs
+[1] FALSE
+
+=============================================================
+ 05a_directional_classifier.R
+ Start: 2026-03-12 19:35:07.086615 
+=============================================================
+
+[INIT] Loading locked diagnostic engine...
+  Genes       : CDKN3, DUSP1, DUSP6, EPM2A, TNS1, PTP4A3, CDC14B, PTP4A2, STYXL1 
+  Up in Tumour: CDKN3, PTP4A2, PTP4A3, STYXL1 
+  Down        : TNS1, DUSP6, CDC14B, EPM2A, DUSP1 
+
+  Loading TCGA-BRCA...
+  TCGA-BRCA: 1219 samples | Tumour: 1106 | Normal: 113 
+
+  Directional Score range : -17.402 to 13.093 
+  Tumour mean: 1.449 | Normal mean: -11.73 
+
+─────────────────────────────────────────────────────────────
+SECTION A: Directional profile
+─────────────────────────────────────────────────────────────
+
+  Directional profile (TCGA-BRCA training — pipeline-derived only):
+
+  CDKN3           ↑ Tumor  Normal=1.798  Tumour=4.114  Log2FC=+1.194  FDR=7.94e-61  SHAP=High
+  CDC14B          ↓ Tumor  Normal=3.856  Tumour=2.234  Log2FC=-0.787  FDR=1.06e-57  SHAP=Medium
+  TNS1            ↓ Tumor  Normal=7.599  Tumour=4.869  Log2FC=-0.642  FDR=2.47e-62  SHAP=High
+  EPM2A           ↓ Tumor  Normal=1.889  Tumour=1.282  Log2FC=-0.559  FDR=6.96e-42  SHAP=Medium
+  DUSP6           ↓ Tumor  Normal=7.059  Tumour=5.355  Log2FC=-0.399  FDR=1.52e-47  SHAP=High
+  DUSP1           ↓ Tumor  Normal=9.770  Tumour=7.509  Log2FC=-0.380  FDR=9.91e-47  SHAP=Low
+  PTP4A3          ↑ Tumor  Normal=4.344  Tumour=5.209  Log2FC=+0.262  FDR=2.29e-28  SHAP=Low
+  STYXL1          ↑ Tumor  Normal=5.178  Tumour=5.936  Log2FC=+0.197  FDR=9.93e-32  SHAP=Low
+  PTP4A2          ↑ Tumor  Normal=7.123  Tumour=7.439  Log2FC=+0.063  FDR=1.62e-08  SHAP=Medium
+
+  [SAVED] A_directional_profile.csv
+
+  [SAVED] Fig_05a_A1_Profile (PNG 300dpi + TIFF 600dpi + PDF)
+─────────────────────────────────────────────────────────────
+SECTION B: Classifier comparison (XGBoost vs Directional vs Hybrid)
+─────────────────────────────────────────────────────────────
+
+  XGBoost AUC     : 0.9997 [0.9992–1.0000]
+  Directional AUC : 0.9963 [0.9940–0.9987]  DeLong p vs XGB: 0.0041
+  Fitting 5-fold CV hybrid classifier...
+  Hybrid AUC      : 0.9992 [0.9976–1.0000]  DeLong p vs XGB: 0.3188
+
+  [SAVED] B_classifier_comparison.csv
+          Classifier    AUC AUC_CI_Lo
+1 XGBoost (Bayesian) 0.9997    0.9992
+2  Directional Score 0.9963    0.9940
+3   Hybrid (XGB+Dir) 0.9992    0.9976
+  AUC_CI_Hi Sensitivity Specificity
+1    1.0000      0.9973      1.0000
+2    0.9987      0.9774      0.9646
+3    1.0000      0.9973      1.0000
+  DeLong_p_vs_XGB
+1              NA
+2          0.0041
+3          0.3188
+  [SAVED] B_sample_scores.csv  ← input for 05b_subtype_specificity.R
+
+  [SAVED] Fig_05a_B1_Triple_ROC (PNG 300dpi + TIFF 600dpi + PDF)
+  [SAVED] Fig_05a_B2_ScoreViolin (PNG 300dpi + TIFF 600dpi + PDF)
+
+─────────────────────────────────────────────────────────────
+SECTION D: Organ specificity
+─────────────────────────────────────────────────────────────
+
+  Loading Lung ...
+  Loading Kidney ...
+  Loading Colon ...
+  Loading Glioblastoma ...
+  Loading Prostate ...
+  Loading Melanoma ...
+  Breast vs Lung            Dir=0.6658  XGB=0.7511
+  Breast vs Kidney          Dir=0.9080  XGB=0.8889
+  Breast vs Colon           Dir=0.3674  XGB=0.5521
+  Breast vs Glioblastoma    Dir=0.6620  XGB=0.7378
+  Breast vs Prostate        Dir=0.7008  XGB=0.8402
+  Breast vs Melanoma        Dir=0.5038  XGB=0.7566
+  [SAVED] D_orgspec_AUC.csv
+
+  [SAVED] Fig_05a_D1_OrgSpec_Forest (PNG 300dpi + TIFF 600dpi + PDF)
+
+─────────────────────────────────────────────────────────────
+SECTION E: Clinical relevance (threshold analysis)
+─────────────────────────────────────────────────────────────
+
+  [SAVED] E_clinical_threshold_table.csv
+  [SAVED] E_best_threshold_summary.csv
+
+  ── Youden-optimal thresholds ──
+# A tibble: 8 × 10
+  Comparison      Threshold Sensitivity Specificity   PPV    NPV
+  <chr>               <dbl>       <dbl>       <dbl> <dbl>  <dbl>
+1 Breast_Tumour_…    -5.44       0.965        0.965 0.996 0.736 
+2 Breast_vs_All_…    -2.05       0.744        0.514 0.448 0.791 
+3 Breast_vs_Colon     9.10       0.0189       0.977 0.676 0.278 
+4 Breast_vs_Glio…     2.06       0.413        0.930 0.979 0.169 
+5 Breast_vs_Kidn…    -4.58       0.856        0.896 0.949 0.733 
+6 Breast_vs_Lung      0.340      0.560        0.724 0.824 0.416 
+7 Breast_vs_Mela…     4.07       0.230        0.874 0.956 0.0875
+8 Breast_vs_Pros…    -0.475      0.625        0.719 0.844 0.441 
+# ℹ 4 more variables: LR_Positive <dbl>, LR_Negative <dbl>,
+#   Youden_J <dbl>, MCC <dbl>
+  [SAVED] Fig_05a_E1_Clinical_Thresholds (PNG 300dpi + TIFF 600dpi + PDF)
+  [SAVED] Fig_05a_E2_LikelihoodRatios (PNG 300dpi + TIFF 600dpi + PDF)
+
+  [SAVED] 05a_Directional_Results.rds
+
+=============================================================
+ 05a_directional_classifier.R  COMPLETE
+ Runtime: 0.77 mins
+
+ SAVED ARTEFACTS:
+  Tables  : A_directional_profile.csv
+            B_classifier_comparison.csv
+            B_sample_scores.csv          ← KEY INPUT for 05b
+            D_orgspec_AUC.csv
+            E_clinical_threshold_table.csv
+            E_best_threshold_summary.csv
+            05a_Directional_Results.rds
+  Figures : Fig_05a_A1_Profile.*
+            Fig_05a_B1_Triple_ROC.*
+            Fig_05a_B2_ScoreViolin.*
+            Fig_05a_D1_OrgSpec_Forest.*
+            Fig_05a_E1_Clinical_Thresholds.*
+            Fig_05a_E2_LikelihoodRatios.*
+            (PNG 300dpi + TIFF 600dpi + PDF)
+  Logs    : 05a_Directional_Run_[timestamp].log
+            05a_session_info.txt
+=============================================================
+           used  (Mb) gc trigger   (Mb)
+Ncells 10040501 536.3   29222430 1560.7
+Vcells 20359874 155.4  189005122 1442.0
+        max used   (Mb)
+Ncells  29222430 1560.7
+Vcells 317574655 2423.0
+$out
+[1] FALSE
+
+$figures
+[1] FALSE
+
+$logs
+[1] FALSE
+
+=============================================================
+ 05b_subtype_specificity.R
+ Start: 2026-03-12 20:02:02.828344 
+=============================================================
+
+[1/5] Loading scores from 05a...
+  Loaded 1219 samples
+  Tumour: 1106 | Normal: 113 
+
+[2/5] Fetching PAM50 subtype labels...
+  Loading from cache: data/TCGA_BRCA_PAM50_Subtypes.csv 
+
+[3/5] Merging and harmonising subtypes...
+  Raw subtype counts (before exclusion):
+
+     Basal       HER2       LumA 
+       193         82        581 
+      LumB NormalLike 
+       219        143 
+
+  [EXCLUSION] Normal-like tumours excluded: 143 records
+  Reason: stromal contamination artefact — not a true molecular subtype.
+  This prevents low-purity biopsies from being miscoded as 'low aggression'.
+  Matched-normal tissue (TCGA code-11) is RETAINED as the Normal reference.
+
+  ── Matched dataset summary ──
+  Tumour samples with PAM50 call   : 1066 (96.4% of 1106) 
+  Tumours dropped (no annotation)  : 40 
+  Normal tissue samples retained   : 113 
+
+  Final subtype distribution:
+
+Normal   LumA   LumB   HER2  Basal 
+   113    572    217     82    195 
+  [SAVED] PAM50_merged_scores.csv
+
+[4/5] Statistical analysis...
+
+  Kruskal-Wallis XGBoost      : H=381.131, df=4, p=<0.001
+  Kruskal-Wallis Dir Score    : H=490.727, df=4, p=<0.001
+
+  [SAVED] PAM50_pairwise_wilcoxon.csv
+  Directional Score — significant pairwise comparisons (BH-FDR < 0.05):
+    Normal vs LumA: FDR=0.0000
+    Normal vs LumB: FDR=0.0000
+    Normal vs HER2: FDR=0.0000
+    Normal vs Basal: FDR=0.0000
+    LumA vs LumB: FDR=0.0000
+    LumA vs HER2: FDR=0.0000
+    LumA vs Basal: FDR=0.0000
+    LumB vs HER2: FDR=0.0000
+    LumB vs Basal: FDR=0.0039
+    HER2 vs Basal: FDR=0.0010
+
+  Spearman ρ (XGBoost vs aggressiveness rank) : ρ=0.3027  p=<0.001
+  Spearman ρ (Dir Score vs aggressiveness rank): ρ=0.5535  p=<0.001
+
+  Interpretation:
+  A positive ρ close to 1.0 means the score increases monotonically with
+  clinical aggressiveness (Normal → Basal), supporting prognostic utility.
+
+  [SAVED] PAM50_score_summary.csv
+
+# A tibble: 5 × 8
+  SubtypeFinal     N Mean_XGB SD_XGB
+  <fct>        <int>    <dbl>  <dbl>
+1 Normal         113    0.018 0.0354
+2 LumA           572    0.979 0.076 
+3 LumB           217    0.998 0.003 
+4 HER2            82    0.991 0.0253
+5 Basal          195    0.994 0.0108
+# ℹ 4 more variables: Median_XGB <dbl>,
+#   Mean_Dir <dbl>, SD_Dir <dbl>,
+#   Median_Dir <dbl>
+  ── ROC / AUC: each PAM50 subtype vs Normal ──
+
+  LumA   vs Normal  Dir AUC=0.9954 [0.9922-0.9987]  XGB AUC=1.0000 [0.9999-1.0000]  DeLong p=0.0061
+  LumB   vs Normal  Dir AUC=1.0000 [1.0000-1.0000]  XGB AUC=1.0000 [1.0000-1.0000]  DeLong p=1.0000
+  HER2   vs Normal  Dir AUC=0.9992 [0.9980-1.0000]  XGB AUC=1.0000 [1.0000-1.0000]  DeLong p=0.2523
+  Basal  vs Normal  Dir AUC=0.9999 [0.9996-1.0000]  XGB AUC=1.0000 [1.0000-1.0000]  DeLong p=0.3854
+
+  DeLong Basal vs LumA — Dir Score: p=0.0083  XGBoost: p=0.4797
+  [SAVED] PAM50_subtype_AUC_table.csv
+
+
+[5/5] Generating figures...
+  [SAVED] Fig_05b_1_PAM50_Violin (PNG 300dpi + TIFF 600dpi + PDF)
+  [SAVED] Fig_05b_2_Gradient (PNG 300dpi + TIFF 600dpi + PDF)
+  [SAVED] Fig_05b_3_PAM50_Counts (PNG 300dpi + TIFF 600dpi + PDF)
+  [SAVED] Fig_05b_4_Pairwise_FDR (PNG 300dpi + TIFF 600dpi + PDF)
+  [SAVED] Fig_05b_5_ROC_Dir_bySubtype (PNG 300dpi + TIFF 600dpi + PDF)
+  [SAVED] Fig_05b_6_ROC_XGB_bySubtype (PNG 300dpi + TIFF 600dpi + PDF)
+  [SAVED] Fig_05b_7_AUC_Forest (PNG 300dpi + TIFF 600dpi + PDF)
+  [SAVED] 05b_Subtype_Results.rds
+
+=============================================================
+ 05b_subtype_specificity.R  COMPLETE
+ Runtime: 0.2 mins
+
+ SAVED ARTEFACTS:
+  Tables  : PAM50_merged_scores.csv
+            PAM50_score_summary.csv        (mean ± SD per subtype)
+            PAM50_pairwise_wilcoxon.csv    (BH-FDR pairwise, both scores)
+            PAM50_subtype_AUC_table.csv    (AUC per subtype vs Normal, DeLong)
+            05b_Subtype_Results.rds
+  Figures : Fig_05b_1_PAM50_Violin.*
+            Fig_05b_2_Gradient.*
+            Fig_05b_3_Subtype_Counts.*
+            Fig_05b_4_Pairwise_FDR.*
+            Fig_05b_5_ROC_Dir_bySubtype.*  (Dir Score ROC per subtype)
+            Fig_05b_6_ROC_XGB_bySubtype.*  (XGB ROC per subtype)
+            Fig_05b_7_AUC_Forest.*         (AUC forest plot, both scores)
+            (PNG 300dpi + TIFF 600dpi + PDF)
+  Logs    : 05b_Subtype_Run_[timestamp].log
+            05b_session_info.txt
+
+ NORMAL-LIKE EXCLUSION AUDIT:
+  Records excluded: 143 
+  Reason: PAM50 Normal-like = stromal contamination artefact,
+          not a true molecular subtype. Standard TCGA practice.
+=============================================================
+           used  (Mb) gc trigger   (Mb)  max used   (Mb)
+Ncells 11847134 632.8   29222430 1560.7  29222430 1560.7
+Vcells 24370151 186.0  151204098 1153.6 317574655 2423.0
+$out
+[1] TRUE
+
+$figures
+[1] TRUE
+
+$logs
+[1] TRUE
+
+=============================================================
+ 06_metabric_validation.R
+ Start: 2026-03-12 20:07:21.642198 
+=============================================================
+
+[INIT] Loading locked diagnostic engine from 01_training_pipeline.R...
+
+  Signature genes : CDKN3, DUSP1, DUSP6, EPM2A, TNS1, PTP4A3, CDC14B, PTP4A2, STYXL1 
+  Up in Tumour    : CDKN3, PTP4A2, PTP4A3, STYXL1 
+  Down in Tumour  : TNS1, DUSP6, CDC14B, EPM2A, DUSP1 
+
+  TCGA reference: Normal mean= -11.73 SD= 2.932 
+  TCGA reference: Tumour mean= 1.449 
+
+─────────────────────────────────────────────────────────────
+SECTION A: METABRIC data loading and platform QC
+─────────────────────────────────────────────────────────────
+
+           used  (Mb) gc trigger   (Mb)  max used   (Mb)
+Ncells 11859396 633.4   29222430 1560.7  29222430 1560.7
+Vcells 24410418 186.3  120963279  922.9 317574655 2423.0
+$out
+[1] FALSE
+
+$figures
+[1] FALSE
+
+$logs
+[1] FALSE
+
+=============================================================
+ 06_metabric_validation.R — Subtype Specificity + Survival
+ Start: 2026-03-12 20:38:45.290464 
+=============================================================
+
+[INIT] Loading locked diagnostic engine...
+
+  Stable genes  : CDKN3, DUSP1, DUSP6, EPM2A, TNS1, PTP4A3, CDC14B, PTP4A2, STYXL1 
+  Up in Tumour  : CDKN3, PTP4A2, PTP4A3, STYXL1 
+  Down in Tumour: TNS1, DUSP6, CDC14B, EPM2A, DUSP1 
+
+  TCGA reference: Normal mean=-11.730 SD=2.932
+  TCGA reference: Tumour mean=1.449
+
+─────────────────────────────────────────────────────────────
+SECTION A: METABRIC data loading & platform QC
+─────────────────────────────────────────────────────────────
+
+  Loading tumour expression matrix...
+  Raw matrix: 20603 genes × 1980 samples
+  Signature genes found: 9 / 9
+  Expression range: 5.12 to 14.46 (expected log₂ scale ~3-15)
+  Tumour samples loaded: 1980
+
+  Directional Score: mean=-2.224  SD=2.648  range [-11.968, 6.188]
+
+  Threshold (METABRIC-internal median): -2.1407
+  Score High: n=990  |  Score Low: n=990
+
+  [SAVED] Fig_06_A1_Expression_Dist (PNG 300dpi + TIFF 600dpi + PDF)
+  [SAVED] Fig_06_A2_Score_Distribution (PNG 300dpi + TIFF 600dpi + PDF)
+  [SAVED] Fig_06_A3_CrossCohort_Density (PNG 300dpi + TIFF 600dpi + PDF)
+  [SAVED] A_Gene_Coverage_Audit.csv
+
+─────────────────────────────────────────────────────────────
+SECTION C: Subtype Specificity — PAM50 Aggressiveness Gradient
+─────────────────────────────────────────────────────────────
+
+  Clinical sample file: 2509 rows × 13 columns
+  PAM50 column: NOT FOUND 
+  [SKIP] PAM50 column not found in clinical data.
+  Expected: CLAUDIN_SUBTYPE or Pam50_+_Claudin-low_subtype
+
+
+─────────────────────────────────────────────────────────────
+SECTION D: ER/PR/HER2 receptor status stratification
+─────────────────────────────────────────────────────────────
+
+
+> # =============================================================================
+> # Script      : 06_metabric_validation.R
+> # Project     : RNA-seq .... [TRUNCATED] 
+           used  (Mb) gc trigger   (Mb)  max used   (Mb)
+Ncells 11889698 635.0   29222430 1560.7  29222430 1560.7
+Vcells 24550650 187.4   96770624  738.4 317574655 2423.0
+
+> # =============================================================================
+> # USER CONFIGURATION
+> # ========================================= .... [TRUNCATED] 
+
+> PATHS <- list(
++   model       = file.path("output","models","final_xgboost_model_Bayesian.rds"),
++   scaler      = file.path("output","models","fin ..." ... [TRUNCATED] 
+
+> # =============================================================================
+> # 0. PACKAGES
+> # ================================================ .... [TRUNCATED] 
+
+> pacman::p_load(
++   here, data.table, dplyr, tibble, tidyr, stringr,
++   xgboost, caret, pROC, ggplot2, scales,
++   survival, survminer
++ )
+
+> if (!requireNamespace("survminer",quietly=TRUE)) {
++   install.packages("survminer"); library(survminer)
++ }
+
+> select <- dplyr::select; filter <- dplyr::filter; mutate <- dplyr::mutate
+
+> # =============================================================================
+> # DIRECTORIES & LOGGING
+> # ====================================== .... [TRUNCATED] 
+
+> lapply(dirs, dir.create, recursive=TRUE, showWarnings=FALSE)
+$out
+[1] FALSE
+
+$figures
+[1] FALSE
+
+$logs
+[1] FALSE
+
+
+> log_path <- file.path(dirs$logs,
++                       paste0("06_METABRIC_Run_",format(Sys.time(),"%Y%m%d_%H%M"),".log"))
+
+> sink(log_path, append=FALSE, split=TRUE)
+
+> t_start <- Sys.time()
+
+> cat("=============================================================\n")
+=============================================================
+
+> cat(" 06_metabric_validation.R — Subtype Specificity + Survival\n")
+ 06_metabric_validation.R — Subtype Specificity + Survival
+
+> cat(" Start:", as.character(t_start), "\n")
+ Start: 2026-03-12 20:53:30.430502 
+
+> cat("=============================================================\n\n")
+=============================================================
+
+
+> set.seed(CONFIG$seed)
+
+> # =============================================================================
+> # SHARED AESTHETICS
+> # ========================================== .... [TRUNCATED] 
+
+> PAM50_COLOURS <- c(
++   LumA  = "#74ADD1", LumB  = "#F4A582",
++   HER2  = "#D73027", Basal = "#7B2D8B"
++ )
+
+> RECEPTOR_COLOURS <- c(
++   "ER+/HER2-"  = "#2166AC", "ER+/HER2+"  = "#74ADD1",
++   "ER-/HER2+"  = "#D73027", "Triple Neg" = "#7B2D8B",
++   "Other"   .... [TRUNCATED] 
+
+> theme_publication <- function(base_size=12) {
++   theme_bw(base_size=base_size) +
++     theme(
++       plot.title       = element_text(face="bold",h .... [TRUNCATED] 
+
+> save_figure <- function(plot_obj, filename_base, width=9, height=8,
++                         out_dir=dirs$figures) {
++   base <- file.path(out_dir, .... [TRUNCATED] 
+
+> compute_dir_score <- function(X_df, up_g, down_g) {
++   up_p  <- intersect(up_g,   colnames(X_df))
++   dn_p  <- intersect(down_g, colnames(X_df))
++  .... [TRUNCATED] 
+
+> # =============================================================================
+> # 1. LOAD LOCKED DIAGNOSTIC ENGINE (from 01_training_pipeline.R)
+> .... [TRUNCATED] 
+[INIT] Loading locked diagnostic engine...
+
+
+> req_paths <- c(PATHS$model, PATHS$scaler, PATHS$sig, PATHS$dir_sig)
+
+> miss      <- req_paths[!file.exists(req_paths)]
+
+> if (length(miss) > 0)
++   stop("Missing artefacts — run 01_training_pipeline.R first:\n",
++        paste(miss, collapse="\n"))
+
+> final_model    <- readRDS(PATHS$model)
+
+> preProc_scaler <- readRDS(PATHS$scaler)
+
+> stable_genes   <- readRDS(PATHS$sig)
+
+> clean_genes    <- gsub("_","-", stable_genes)
+
+> dir_sig        <- readRDS(PATHS$dir_sig)
+
+> # Parse directional vectors (unicode arrow, safe startsWith parser)
+> up_genes   <- dir_sig$Gene[startsWith(dir_sig$Direction, "\u2191")]
+
+> down_genes <- dir_sig$Gene[startsWith(dir_sig$Direction, "\u2193")]
+
+> if (length(up_genes) == 0 & length(down_genes) == 0) {
++   cat("  [WARN] Arrow parsing returned 0 genes — falling back to log2FC sign\n")
++   up_gen .... [TRUNCATED] 
+
+> if (length(up_genes) + length(down_genes) == 0)
++   stop("Could not parse directional genes from Final_Directional_Signature.rds")
+
+> cat("  Stable genes  :", paste(clean_genes,  collapse=", "), "\n")
+  Stable genes  : CDKN3, DUSP1, DUSP6, EPM2A, TNS1, PTP4A3, CDC14B, PTP4A2, STYXL1 
+
+> cat("  Up in Tumour  :", paste(up_genes,     collapse=", "), "\n")
+  Up in Tumour  : CDKN3, PTP4A2, PTP4A3, STYXL1 
+
+> cat("  Down in Tumour:", paste(down_genes,   collapse=", "), "\n\n")
+  Down in Tumour: TNS1, DUSP6, CDC14B, EPM2A, DUSP1 
+
+
+> # TCGA reference for annotation lines on distribution plots
+> tcga_ref_scores <- NULL
+
+> tcga_normal_mean <- NA; tcga_normal_sd <- NA; tcga_tumor_mean <- NA
+
+> if (file.exists(PATHS$tcga_scores)) {
++   tcga_ref_scores  <- read.csv(PATHS$tcga_scores, stringsAsFactors=FALSE)
++   tcga_normal_mean <- mean(tcga_ .... [TRUNCATED] 
+  TCGA reference: Normal mean=-11.730 SD=2.932
+  TCGA reference: Tumour mean=1.449
+
+
+> # =============================================================================
+> # SECTION A — METABRIC DATA LOADING & PLATFORM QC
+> # ============ .... [TRUNCATED] 
+─────────────────────────────────────────────────────────────
+
+> cat("SECTION A: METABRIC data loading & platform QC\n")
+SECTION A: METABRIC data loading & platform QC
+
+> cat("─────────────────────────────────────────────────────────────\n\n")
+─────────────────────────────────────────────────────────────
+
+
+> if (!file.exists(PATHS$met_expr))
++   stop("METABRIC expression file not found: ", PATHS$met_expr,
++        "\nDownload from cBioportal: brca_metabr ..." ... [TRUNCATED] 
+           used  (Mb) gc trigger   (Mb)  max used   (Mb)
+Ncells 11879215 634.5   29222430 1560.7  29222430 1560.7
+Vcells 24543526 187.3   77416500  590.7 317574655 2423.0
+$out
+[1] FALSE
+
+$figures
+[1] FALSE
+
+$logs
+[1] FALSE
+
+=============================================================
+ 06_metabric_validation.R — Subtype Specificity + Survival
+ Start: 2026-03-12 20:53:57.9205 
+=============================================================
+
+[INIT] Loading locked diagnostic engine...
+
+  Stable genes  : CDKN3, DUSP1, DUSP6, EPM2A, TNS1, PTP4A3, CDC14B, PTP4A2, STYXL1 
+  Up in Tumour  : CDKN3, PTP4A2, PTP4A3, STYXL1 
+  Down in Tumour: TNS1, DUSP6, CDC14B, EPM2A, DUSP1 
+
+  TCGA reference: Normal mean=-11.730 SD=2.932
+  TCGA reference: Tumour mean=1.449
+
+─────────────────────────────────────────────────────────────
+SECTION A: METABRIC data loading & platform QC
+─────────────────────────────────────────────────────────────
+
+  Loading tumour expression matrix...
+  Raw matrix: 20603 genes × 1980 samples
+  Signature genes found: 9 / 9
+  Expression range: 5.12 to 14.46 (expected log₂ scale ~3-15)
+  Tumour samples loaded: 1980
+
+  Directional Score: mean=-2.224  SD=2.648  range [-11.968, 6.188]
+
+  Threshold (METABRIC-internal median): -2.1407
+  Score High: n=990  |  Score Low: n=990
+
+  [SAVED] Fig_06_A1_Expression_Dist (PNG 300dpi + TIFF 600dpi + PDF)
+  [SAVED] Fig_06_A2_Score_Distribution (PNG 300dpi + TIFF 600dpi + PDF)
+  [SAVED] Fig_06_A3_CrossCohort_Density (PNG 300dpi + TIFF 600dpi + PDF)
+  [SAVED] A_Gene_Coverage_Audit.csv
+
+─────────────────────────────────────────────────────────────
+SECTION C: Subtype Specificity — PAM50 Aggressiveness Gradient
+─────────────────────────────────────────────────────────────
+
+  Patient↔Sample bridge: 2509 rows
+  Clinical patient file: 2509 rows × 24 columns
+  PAM50 column: CLAUDIN_SUBTYPE 
+  [EXCLUSION] Normal-like: 148 | Claudin-low: 218 | Unclassified: 535
+  Rationale: Normal-like = stromal contamination artefact (not a true subtype).
+             Claudin-low = rare mixed phenotype excluded for consistency.
+
+  Subtype counts (after exclusions):
+
+ LumA  LumB  HER2 Basal 
+  700   475   224   209 
+
+  Kruskal-Wallis: H=170.772  p=<0.001
+  Pairwise Wilcoxon (BH-FDR):
+       LumA   LumB   HER2
+LumB  0e+00     NA     NA
+HER2  1e-04 0.0000     NA
+Basal 0e+00 0.0103 0.0132
+           used  (Mb) gc trigger   (Mb)  max used   (Mb)
+Ncells 11879555 634.5   29222430 1560.7  29222430 1560.7
+Vcells 24448081 186.6   74385648  567.6 317574655 2423.0
+$out
+[1] FALSE
+
+$figures
+[1] FALSE
+
+$logs
+[1] FALSE
+
+=============================================================
+ 06_metabric_validation.R — Subtype Specificity + Survival
+ Start: 2026-03-12 20:56:28.910883 
+=============================================================
+
+[INIT] Loading locked diagnostic engine...
+
+  Stable genes  : CDKN3, DUSP1, DUSP6, EPM2A, TNS1, PTP4A3, CDC14B, PTP4A2, STYXL1 
+  Up in Tumour  : CDKN3, PTP4A2, PTP4A3, STYXL1 
+  Down in Tumour: TNS1, DUSP6, CDC14B, EPM2A, DUSP1 
+
+  TCGA reference: Normal mean=-11.730 SD=2.932
+  TCGA reference: Tumour mean=1.449
+
+─────────────────────────────────────────────────────────────
+SECTION A: METABRIC data loading & platform QC
+─────────────────────────────────────────────────────────────
+
+           used  (Mb) gc trigger   (Mb)  max used   (Mb)
+Ncells 11879119 634.5   29222430 1560.7  29222430 1560.7
+Vcells 24444962 186.6   74385648  567.6 317574655 2423.0
+$out
+[1] FALSE
+
+$figures
+[1] FALSE
+
+$logs
+[1] FALSE
+
+=============================================================
+ 06_metabric_validation.R — Subtype Specificity + Survival
+ Start: 2026-03-12 20:56:43.55647 
+=============================================================
+
+[INIT] Loading locked diagnostic engine...
+
+  Stable genes  : CDKN3, DUSP1, DUSP6, EPM2A, TNS1, PTP4A3, CDC14B, PTP4A2, STYXL1 
+  Up in Tumour  : CDKN3, PTP4A2, PTP4A3, STYXL1 
+  Down in Tumour: TNS1, DUSP6, CDC14B, EPM2A, DUSP1 
+
+  TCGA reference: Normal mean=-11.730 SD=2.932
+  TCGA reference: Tumour mean=1.449
+
+─────────────────────────────────────────────────────────────
+SECTION A: METABRIC data loading & platform QC
+─────────────────────────────────────────────────────────────
+
+  Loading tumour expression matrix...
+  Raw matrix: 20603 genes × 1980 samples
+  Signature genes found: 9 / 9
+  Expression range: 5.12 to 14.46 (expected log₂ scale ~3-15)
+  Tumour samples loaded: 1980
+
+  Directional Score: mean=-2.224  SD=2.648  range [-11.968, 6.188]
+
+  Threshold (METABRIC-internal median): -2.1407
+  Score High: n=990  |  Score Low: n=990
+
+  [SAVED] Fig_06_A1_Expression_Dist (PNG 300dpi + TIFF 600dpi + PDF)
+  [SAVED] Fig_06_A2_Score_Distribution (PNG 300dpi + TIFF 600dpi + PDF)
+  [SAVED] Fig_06_A3_CrossCohort_Density (PNG 300dpi + TIFF 600dpi + PDF)
+  [SAVED] A_Gene_Coverage_Audit.csv
+
+─────────────────────────────────────────────────────────────
+SECTION C: Subtype Specificity — PAM50 Aggressiveness Gradient
+─────────────────────────────────────────────────────────────
+
+  Patient↔Sample bridge: 2509 rows
+  Clinical patient file: 2509 rows × 24 columns
+  PAM50 column: CLAUDIN_SUBTYPE 
+  [EXCLUSION] Normal-like: 148 | Claudin-low: 218 | Unclassified: 535
+  Rationale: Normal-like = stromal contamination artefact (not a true subtype).
+             Claudin-low = rare mixed phenotype excluded for consistency.
+
+  Subtype counts (after exclusions):
+
+ LumA  LumB  HER2 Basal 
+  700   475   224   209 
+
+  Kruskal-Wallis: H=170.772  p=<0.001
+  Pairwise Wilcoxon (BH-FDR):
+       LumA   LumB   HER2
+LumB  0e+00     NA     NA
+HER2  1e-04 0.0000     NA
+Basal 0e+00 0.0103 0.0132
+
+  Spearman ρ (score vs aggressiveness rank): ρ=0.2261  p=<0.001
+  Rank: LumA=1 → LumB=2 → HER2=3 → Basal=4
+
+  Per-subtype summary:
+# A tibble: 4 × 5
+  PAM50     N   Mean    SD Median
+  <fct> <int>  <dbl> <dbl>  <dbl>
+1 LumA    700 -2.54   2.38 -2.48 
+2 LumB    475 -0.742  2.04 -0.869
+3 HER2    224 -1.76   2.34 -1.75 
+4 Basal   209 -1.30   2.16 -1.05 
+
+  ── One-vs-rest AUC (within METABRIC tumours) ──
+
+  LumA   vs others  AUC=0.3290 [0.3025-0.3555]
+  LumB   vs others  AUC=0.6720 [0.6446-0.6994]
+  HER2   vs others  AUC=0.4886 [0.4478-0.5295]
+  Basal  vs others  AUC=0.5673 [0.5270-0.6076]
+  [SAVED] C_PAM50_summary.csv
+  [SAVED] C_PAM50_pairwise.csv
+  [SAVED] C_PAM50_AUC_table.csv
+
+  [SAVED] Fig_06_C1_PAM50_Violin (PNG 300dpi + TIFF 600dpi + PDF)
+  [SAVED] Fig_06_C2_PAM50_Gradient (PNG 300dpi + TIFF 600dpi + PDF)
+  [SAVED] Fig_06_C3_PAM50_AUC_Forest (PNG 300dpi + TIFF 600dpi + PDF)
+  [SAVED] Fig_06_C4_ROC_bySubtype (PNG 300dpi + TIFF 600dpi + PDF)
+
+─────────────────────────────────────────────────────────────
+SECTION D: ER/PR/HER2 receptor status stratification
+─────────────────────────────────────────────────────────────
+
+  Sample ID col: SAMPLE_ID | ER col: ER_STATUS | HER2 col: HER2_STATUS
+  Receptor group summary:
+# A tibble: 4 × 5
+  ReceptorGroup     N  Mean    SD Median
+  <chr>         <int> <dbl> <dbl>  <dbl>
+1 ER+/HER2+       108 -1.66  2.27  -1.66
+2 ER+/HER2-      1398 -2.16  2.68  -2.13
+3 Triple Neg      335 -2.35  2.77  -1.94
+4 ER-/HER2+       139 -3.05  2.08  -3.19
+
+  Kruskal-Wallis: p=<0.001
+  Triple Neg vs ER+/HER2-  AUC=0.4931 [0.4585-0.5278]
+
+  [SAVED] D_Receptor_AUC.csv
+  [SAVED] D_Receptor_summary.csv
+  [SAVED] Fig_06_D1_Receptor_Violin (PNG 300dpi + TIFF 600dpi + PDF)
+
+─────────────────────────────────────────────────────────────
+SECTION E: Tumour grade stratification
+─────────────────────────────────────────────────────────────
+
+  Sample ID col: SAMPLE_ID | Grade col: GRADE
+  Grade summary:
+# A tibble: 3 × 5
+  Grade       N  Mean    SD Median
+  <fct>   <int> <dbl> <dbl>  <dbl>
+1 Grade 1   169 -3.58  2.70  -3.41
+2 Grade 2   771 -2.43  2.66  -2.34
+3 Grade 3   952 -1.79  2.48  -1.65
+
+  Kruskal-Wallis: p=<0.001
+  Grade 3 vs Grade 1  AUC=0.6881 [0.6441-0.7322]
+
+  [SAVED] E_Grade_AUC.csv
+  [SAVED] E_Grade_summary.csv
+  [SAVED] Fig_06_E1_Grade_Violin (PNG 300dpi + TIFF 600dpi + PDF)
+
+─────────────────────────────────────────────────────────────
+SECTION F: Prognostic Value — Kaplan-Meier + Cox Regression
+─────────────────────────────────────────────────────────────
+
+  Patient ID col  : PATIENT_ID
+  OS time column  : OS_MONTHS
+  OS event column : OS_STATUS
+  RFS time column : RFS_MONTHS
+  RFS event column: RFS_STATUS
+
+  Samples with scores + survival data: 1980
+
+  Overall Survival: n=1980  events=1143 (57.7%)
+  Cox HR (continuous): 1.035 [1.012-1.058]  p=0.0028
+  Relapse-Free Survival: n=1979  events=803 (40.6%)
+  Cox HR (continuous): 1.047 [1.020-1.075]  p=<0.001
+  [SAVED] Fig_06_F1_KM_OS
+  [SAVED] Fig_06_F2_KM_RFS
+
+  [SAVED] Fig_06_F3_Cox_Forest (PNG 300dpi + TIFF 600dpi + PDF)
+           used  (Mb) gc trigger   (Mb)  max used   (Mb)
+Ncells 11966808 639.1   29222430 1560.7  29222430 1560.7
+Vcells 24614570 187.8   71474222  545.4 317574655 2423.0
+$out
+[1] FALSE
+
+$figures
+[1] FALSE
+
+$logs
+[1] FALSE
+
+=============================================================
+ 06_metabric_validation.R — Subtype Specificity + Survival
+ Start: 2026-03-12 22:01:22.492056 
+=============================================================
+
+[INIT] Loading locked diagnostic engine...
+
+  Stable genes  : CDKN3, DUSP1, DUSP6, EPM2A, TNS1, PTP4A3, CDC14B, PTP4A2, STYXL1 
+  Up in Tumour  : CDKN3, PTP4A2, PTP4A3, STYXL1 
+  Down in Tumour: TNS1, DUSP6, CDC14B, EPM2A, DUSP1 
+
+  TCGA reference: Normal mean=-11.730 SD=2.932
+  TCGA reference: Tumour mean=1.449
+
+─────────────────────────────────────────────────────────────
+SECTION A: METABRIC data loading & platform QC
+─────────────────────────────────────────────────────────────
+
+           used  (Mb) gc trigger   (Mb)  max used   (Mb)
+Ncells 11967940 639.2   29222430 1560.7  29222430 1560.7
+Vcells 24616855 187.9   71474222  545.4 317574655 2423.0
+$out
+[1] FALSE
+
+$figures
+[1] FALSE
+
+$logs
+[1] FALSE
+
+=============================================================
+ 06_metabric_validation.R — Subtype Specificity + Survival
+ Start: 2026-03-12 22:02:07.782522 
+=============================================================
+
+[INIT] Loading locked diagnostic engine...
+
+  Stable genes  : CDKN3, DUSP1, DUSP6, EPM2A, TNS1, PTP4A3, CDC14B, PTP4A2, STYXL1 
+  Up in Tumour  : CDKN3, PTP4A2, PTP4A3, STYXL1 
+  Down in Tumour: TNS1, DUSP6, CDC14B, EPM2A, DUSP1 
+
+  TCGA reference: Normal mean=-11.730 SD=2.932
+  TCGA reference: Tumour mean=1.449
+
+─────────────────────────────────────────────────────────────
+SECTION A: METABRIC data loading & platform QC
+─────────────────────────────────────────────────────────────
+
+  Loading tumour expression matrix...
+  Raw matrix: 20603 genes × 1980 samples
+  Signature genes found: 9 / 9
+  Expression range: 5.12 to 14.46 (expected log₂ scale ~3-15)
+  Tumour samples loaded: 1980
+
+  Directional Score: mean=-2.224  SD=2.648  range [-11.968, 6.188]
+
+  Threshold (METABRIC-internal median): -2.1407
+  Score High: n=990  |  Score Low: n=990
+
+  [SAVED] Fig_06_A1_Expression_Dist (PNG 300dpi + TIFF 600dpi + PDF)
+  [SAVED] Fig_06_A2_Score_Distribution (PNG 300dpi + TIFF 600dpi + PDF)
+  [SAVED] Fig_06_A3_CrossCohort_Density (PNG 300dpi + TIFF 600dpi + PDF)
+  [SAVED] A_Gene_Coverage_Audit.csv
+
+─────────────────────────────────────────────────────────────
+SECTION C: Subtype Specificity — PAM50 Aggressiveness Gradient
+─────────────────────────────────────────────────────────────
+
+  Patient↔Sample bridge: 2509 rows
+  Clinical patient file: 2509 rows × 24 columns
+  PAM50 column: CLAUDIN_SUBTYPE 
+  [EXCLUSION] Normal-like: 148 | Claudin-low: 218 | Unclassified: 535
+  Rationale: Normal-like = stromal contamination artefact (not a true subtype).
+             Claudin-low = rare mixed phenotype excluded for consistency.
+
+  Subtype counts (after exclusions):
+
+ LumA  LumB  HER2 Basal 
+  700   475   224   209 
+
+  Kruskal-Wallis: H=170.772  p=<0.001
+  Pairwise Wilcoxon (BH-FDR):
+       LumA   LumB   HER2
+LumB  0e+00     NA     NA
+HER2  1e-04 0.0000     NA
+Basal 0e+00 0.0103 0.0132
+
+  Spearman ρ (score vs aggressiveness rank): ρ=0.2261  p=<0.001
+  Rank: LumA=1 → LumB=2 → HER2=3 → Basal=4
+
+  Per-subtype summary:
+# A tibble: 4 × 5
+  PAM50     N   Mean    SD Median
+  <fct> <int>  <dbl> <dbl>  <dbl>
+1 LumA    700 -2.54   2.38 -2.48 
+2 LumB    475 -0.742  2.04 -0.869
+3 HER2    224 -1.76   2.34 -1.75 
+4 Basal   209 -1.30   2.16 -1.05 
+
+  ── One-vs-rest AUC (within METABRIC tumours) ──
+
+  LumA   vs others  AUC=0.3290 [0.3025-0.3555]
+  LumB   vs others  AUC=0.6720 [0.6446-0.6994]
+  HER2   vs others  AUC=0.4886 [0.4478-0.5295]
+  Basal  vs others  AUC=0.5673 [0.5270-0.6076]
+  [SAVED] C_PAM50_summary.csv
+  [SAVED] C_PAM50_pairwise.csv
+  [SAVED] C_PAM50_AUC_table.csv
+
+  [SAVED] Fig_06_C1_PAM50_Violin (PNG 300dpi + TIFF 600dpi + PDF)
+  [SAVED] Fig_06_C2_PAM50_Gradient (PNG 300dpi + TIFF 600dpi + PDF)
+  [SAVED] Fig_06_C3_PAM50_AUC_Forest (PNG 300dpi + TIFF 600dpi + PDF)
+           used  (Mb) gc trigger   (Mb)  max used   (Mb)
+Ncells 11981255 639.9   29222430 1560.7  29222430 1560.7
+Vcells 24666243 188.2   82479104  629.3 317574655 2423.0
+$out
+[1] FALSE
+
+$figures
+[1] FALSE
+
+$logs
+[1] FALSE
+
+=============================================================
+ 06_metabric_validation.R — Subtype Specificity + Survival
+ Start: 2026-03-12 22:12:21.187028 
+=============================================================
+
+[INIT] Loading locked diagnostic engine...
+
+  Stable genes  : CDKN3, DUSP1, DUSP6, EPM2A, TNS1, PTP4A3, CDC14B, PTP4A2, STYXL1 
+  Up in Tumour  : CDKN3, PTP4A2, PTP4A3, STYXL1 
+  Down in Tumour: TNS1, DUSP6, CDC14B, EPM2A, DUSP1 
+
+  TCGA reference: Normal mean=-11.730 SD=2.932
+  TCGA reference: Tumour mean=1.449
+
+─────────────────────────────────────────────────────────────
+SECTION A: METABRIC data loading & platform QC
+─────────────────────────────────────────────────────────────
+
+  Loading tumour expression matrix...
+  Raw matrix: 20603 genes × 1980 samples
+  Signature genes found: 9 / 9
+  Expression range: 5.12 to 14.46 (expected log₂ scale ~3-15)
+  Tumour samples loaded: 1980
+
+  Directional Score: mean=-2.224  SD=2.648  range [-11.968, 6.188]
+
+  Threshold (METABRIC-internal median): -2.1407
+  Score High: n=990  |  Score Low: n=990
+
+  [SAVED] Fig_06_A1_Expression_Dist (PNG 300dpi + TIFF 600dpi + PDF)
+  [SAVED] Fig_06_A2_Score_Distribution (PNG 300dpi + TIFF 600dpi + PDF)
+  [SAVED] Fig_06_A3_CrossCohort_Density (PNG 300dpi + TIFF 600dpi + PDF)
+  [SAVED] A_Gene_Coverage_Audit.csv
+
+─────────────────────────────────────────────────────────────
+SECTION C: Subtype Specificity — PAM50 Aggressiveness Gradient
+─────────────────────────────────────────────────────────────
+
+  Patient↔Sample bridge: 2509 rows

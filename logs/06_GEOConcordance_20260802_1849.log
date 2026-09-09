@@ -1,0 +1,70 @@
+=============================================================
+ 14_geo_direction_concordance.R
+ Start : 2026-08-02 18:49:40.562713 
+=============================================================
+
+[1/5] Loading locked signature...
+  Signature: 9 genes (4 up, 5 down)
+  Up   : CDKN3, PTP4A2, PTP4A3, STYXL1 
+  Down : TNS1, DUSP6, CDC14B, EPM2A, DUSP1 
+
+[2/5] Loading GEO cohorts...
+  ── GSE233242 ──
+    Mapped 39376 Entrez IDs to 37673 unique gene symbols
+    Retained: 42 tumour, 42 normal
+    max = 98050.0 > 25, applying log2(TPM+1)
+  ── GSE58135 ──
+    28 samples excluded or unmatched (see mapping log)
+    Mapped 39376 Entrez IDs to 37673 unique gene symbols
+    Retained: 84 tumour, 56 normal
+    max = 197100.0 > 25, applying log2(TPM+1)
+
+  ── Sample count verification ──
+    GSE233242  observed 42 T / 42 N | expected 43 T / 43 N  <-- MISMATCH, check mapping log in output/geo_concordance/logs
+    GSE58135   observed 84 T / 56 N | expected 84 T / 56 N  OK
+
+[3/5] Computing per-gene differential expression...
+  [SAVED] 14_gene_concordance_full.csv
+
+  ── GSE233242 (42 tumour / 42 normal) ──
+   gene expected observed log2FC   qval      class
+  CDKN3       Up       Up  1.559 <0.001      Match
+ PTP4A2       Up       Up  0.474 0.0014      Match
+ PTP4A3       Up       Up  0.330 0.0078      Match
+ STYXL1       Up       Up  0.645 <0.001      Match
+   TNS1     Down     Down -1.991 <0.001      Match
+  DUSP6     Down     Down -0.953 <0.001      Match
+ CDC14B     Down     Down -0.595 <0.001      Match
+  EPM2A     Down     Down -0.216 0.0078 Weak match
+  DUSP1     Down     Down -1.174 <0.001      Match
+
+  ── GSE58135 (84 tumour / 56 normal) ──
+   gene expected observed log2FC   qval     class
+  CDKN3       Up       Up  1.382 <0.001     Match
+ PTP4A2       Up     Down -0.540 <0.001 Divergent
+ PTP4A3       Up       Up  0.559 <0.001     Match
+ STYXL1       Up       Up  0.489 <0.001     Match
+   TNS1     Down     Down -3.931 <0.001     Match
+  DUSP6     Down     Down -2.223 <0.001     Match
+ CDC14B     Down     Down -1.345 <0.001     Match
+  EPM2A     Down     Down -0.968 <0.001     Match
+  DUSP1     Down     Down -2.874 <0.001     Match
+
+[4/5] Summarising...
+
+  ── SUMMARY ──
+   dataset n_tumour n_normal n_match n_weak n_divergent n_uninf n_absent n_concordant n_tested full_pattern binom_p
+ GSE233242       42       42       8      1           0       0        0            9        9        FALSE 0.00391
+  GSE58135       84       56       8      0           1       0        0            8        9        FALSE 0.03910
+
+  [SAVED] 14_concordance_summary.csv
+
+[5/5] Generating figures...
+  [SAVED] Fig_14A_Concordance_Matrix 
+  [SAVED] Fig_14B_LogFC_Comparison 
+  [SAVED] 14_GEO_CONCORDANCE_REPORT.txt
+
+=============================================================
+ 14_geo_direction_concordance.R COMPLETE
+ Runtime: 2.26 min
+=============================================================

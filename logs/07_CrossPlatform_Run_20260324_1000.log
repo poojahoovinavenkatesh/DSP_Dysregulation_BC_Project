@@ -1,0 +1,105 @@
+=============================================================
+ 07_crossplatform_validation.R
+ Start   : 2026-03-24 10:00:04.798885 
+ Datasets: 2 
+=============================================================
+
+[1/5] Loading locked diagnostic engine...
+  Signature genes : CDKN3, DUSP1, DUSP6, EPM2A, TNS1, PTP4A3, CDC14B, PTP4A2, STYXL1 
+  Up in Tumour    : CDKN3, PTP4A2, PTP4A3, STYXL1 
+  Down in Tumour  : TNS1, DUSP6, CDC14B, EPM2A, DUSP1 
+
+[2/5] Validating all microarray datasets...
+
+──────────────────────────────────────────────
+Dataset: GSE70947 
+Platform: Agilent SurePrint G3 Human GE 8x60K (GPL13607) 
+  Downloading from GEO (cached after first run)...
+  SearchString preview (first 3):
+    cm016-normal
+    cm022-normal
+    cm082-normal 
+  Tumour: 148  |  Normal: 148
+  Extracting expression matrix from ExpressionSet...
+  Raw matrix: 62976 probes x 296 samples
+  fData columns: ID, ProbeName, GB_ACC, ControlType, accessions, GeneName, Description, chr_coord, SEQUENCE, SPOT_ID 
+  Gene symbol column: 'GeneName'
+  Probes with symbol: 62976 / 62976 (100.0%)
+  Unique gene symbols: 34948
+  Signature coverage: 9 / 9 genes
+  Matched samples: 296
+  Expression range: 4.08 to 15.29 (log₂ confirmed)
+  Dir Score: Tumour mean=NaN  Normal mean=-18.493
+  Directional AUC: 0.8898 [0.8528–0.9269]
+  XGBoost AUC (extrap.): 0.5034 [0.4968–0.5100]  DeLong p=<0.001
+  [SAVED] CrossPlatform_Summary_GSE70947.csv
+  [SAVED] Fig_CP_ROC_GSE70947 (PNG 300dpi + TIFF 600dpi + PDF)
+  [SAVED] Fig_CP_ScoreDist_GSE70947 (PNG 300dpi + TIFF 600dpi + PDF)
+  [SAVED] Fig_CP_Heatmap_GSE70947 (PNG + TIFF)
+──────────────────────────────────────────────
+Dataset: GSE15852 
+Platform: Affymetrix Human Genome U133A Array (GPL96) 
+  Downloading from GEO (cached after first run)...
+  SearchString preview (first 3):
+    normal bc0043n
+    cancer bc0043t
+    normal bc0051n 
+  Tumour: 43  |  Normal: 43
+  Extracting expression matrix from ExpressionSet...
+  Raw matrix: 22283 probes x 86 samples
+  fData columns: ID, Gene title, Gene symbol, Gene ID, UniGene title, UniGene symbol, UniGene ID, Nucleotide Title, GI, GenBank Accession, Platform_CLONEID, Platform_ORF, Platform_SPOTID, Chromosome location, Chromosome annotation, GO:Function, GO:Process, GO:Component, GO:Function ID, GO:Process ID, GO:Component ID 
+  Gene symbol column: 'Gene symbol'
+  Probes with symbol: 21156 / 22283 (94.9%)
+  Unique gene symbols: 13298
+  Signature coverage: 9 / 9 genes
+  Matched samples: 86
+  [WARN] Max value in full matrix = 19036.0 > 100 — applying log2(x+1)
+  Dir Score: Tumour mean=-8.306  Normal mean=-11.621
+  Directional AUC: 0.8686 [0.7963–0.9408]
+  XGBoost AUC (extrap.): 0.6214 [0.5381–0.7048]  DeLong p=<0.001
+  [SAVED] CrossPlatform_Summary_GSE15852.csv
+  [SAVED] Fig_CP_ROC_GSE15852 (PNG 300dpi + TIFF 600dpi + PDF)
+  [SAVED] Fig_CP_ScoreDist_GSE15852 (PNG 300dpi + TIFF 600dpi + PDF)
+  [SAVED] Fig_CP_Heatmap_GSE15852 (PNG + TIFF)
+
+  Completed: 2 / 2 datasets
+
+[3/5] Combined figures...
+  [SAVED] Fig_CP_Combined_ROC_Directional (PNG 300dpi + TIFF 600dpi + PDF)
+  [SAVED] Fig_CP_AUC_Comparison (PNG 300dpi + TIFF 600dpi + PDF)
+[4/5] Saving combined summary...
+  [SAVED] CrossPlatform_Summary_ALL_Datasets.csv
+  [SAVED] 07_all_crossplatform_results.rds
+
+
+  ── Cross-Platform Performance Summary ──
+          Dataset                    Platform N_Total N_Tumor N_Normal Genes_Present Dir_AUC
+GSE70947 GSE70947          Agilent microarray     296     148      148             9  0.8898
+GSE15852 GSE15852 Affymetrix U133A microarray      86      43       43             9  0.8686
+         Dir_CI_Lo Dir_CI_Hi Dir_Sensitivity Dir_Specificity Dir_F1
+GSE70947    0.8528    0.9269          0.7347          0.9122 0.8060
+GSE15852    0.7963    0.9408          0.9070          0.6744 0.8125
+[5/5] Session info...
+
+=============================================================
+ 07_crossplatform_validation.R  COMPLETE
+ Runtime: 3.18 mins
+
+ SCIENTIFIC NOTE:
+   PRIMARY metric: Directional Score — no scaler, platform-invariant.
+   SECONDARY metric: XGBoost — TCGA scaler on microarray = extrapolation.
+
+ SAVED ARTEFACTS:
+  Tables  : CrossPlatform_Summary_[dataset].csv
+            CrossPlatform_Summary_ALL_Datasets.csv
+            07_all_crossplatform_results.rds
+  Figures : Fig_CP_ROC_[dataset].*
+            Fig_CP_ScoreDist_[dataset].*
+            Fig_CP_Heatmap_[dataset].*
+            Fig_CP_Combined_ROC_Directional.*
+            Fig_CP_AUC_Comparison.*
+            (PNG 300dpi + TIFF 600dpi + PDF)
+  Logs    : 07_CrossPlatform_Run_[timestamp].log
+            Mapping_Log_[dataset].csv
+            Gene_Coverage_[dataset].csv
+=============================================================

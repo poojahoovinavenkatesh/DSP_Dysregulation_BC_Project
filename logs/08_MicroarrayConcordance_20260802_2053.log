@@ -1,0 +1,241 @@
+=============================================================
+ 15_microarray_direction_concordance.R
+ Start : 2026-08-02 20:53:32.11467 
+=============================================================
+
+[1/5] Loading locked signature...
+  Signature: 9 genes (4 up, 5 down)
+  Up   : CDKN3, PTP4A2, PTP4A3, STYXL1 
+  Down : TNS1, DUSP6, CDC14B, EPM2A, DUSP1 
+
+[2/5] Loading microarray cohorts...
+  ── GSE70947 (Agilent) ──
+    SearchString preview:  cm016-normal ; cm022-normal 
+    Raw matrix: 62976 probes x 296 samples
+    Symbol column: 'GeneName'
+    Probes with a symbol: 62976 / 62976 (100.0%)
+    Unique gene symbols: 34948
+    Retained: 148 tumour, 148 normal
+    max = 18.4, already log2 intensity
+    Signature coverage: 9 / 9 genes
+  ── GSE15852 (Affymetrix) ──
+    SearchString preview:  normal bc0043n ; cancer bc0043t 
+    Raw matrix: 22283 probes x 86 samples
+    Symbol column: 'Gene symbol'
+    Probes with a symbol: 21156 / 22283 (94.9%)
+    Unique gene symbols: 13298
+    Retained: 43 tumour, 43 normal
+    max = 17930.0 > 100, applying log2(x+1)
+    Signature coverage: 9 / 9 genes
+
+  ── Sample count verification ──
+    GSE70947   observed 148 T / 148 N | expected 148 T / 148 N  OK
+    GSE15852   observed 43 T / 43 N | expected 43 T / 43 N  OK
+
+  [SAVED] 15_probe_coverage.csv
+
+[3/5] Computing per-gene differential expression...
+           used  (Mb) gc trigger   (Mb)  max used   (Mb)
+Ncells  7509910 401.1   29849408 1594.2  46639700 2490.9
+Vcells 14455592 110.3  138090503 1053.6 215745774 1646.1
+$out
+[1] FALSE
+
+$figures
+[1] FALSE
+
+$tables
+[1] FALSE
+
+$logs
+[1] FALSE
+
+=============================================================
+ 15_microarray_direction_concordance.R
+ Start : 2026-08-02 21:18:53.009489 
+=============================================================
+
+[1/5] Loading locked signature...
+  Signature: 9 genes (4 up, 5 down)
+  Up   : CDKN3, PTP4A2, PTP4A3, STYXL1 
+  Down : TNS1, DUSP6, CDC14B, EPM2A, DUSP1 
+
+[2/5] Loading microarray cohorts...
+  ── GSE70947 (Agilent) ──
+    SearchString preview:  cm016-normal ; cm022-normal 
+    Raw matrix: 62976 probes x 296 samples
+    Symbol column: 'GeneName'
+    Probes with a symbol: 62976 / 62976 (100.0%)
+    Unique gene symbols: 34948
+    Retained: 148 tumour, 148 normal
+    max = 18.4, already log2 intensity
+    Signature coverage: 9 / 9 genes
+  ── GSE15852 (Affymetrix) ──
+    SearchString preview:  normal bc0043n ; cancer bc0043t 
+    Raw matrix: 22283 probes x 86 samples
+    Symbol column: 'Gene symbol'
+    Probes with a symbol: 21156 / 22283 (94.9%)
+    Unique gene symbols: 13298
+    Retained: 43 tumour, 43 normal
+    max = 17930.0 > 100, applying log2(x+1)
+    Signature coverage: 9 / 9 genes
+
+  ── Sample count verification ──
+    GSE70947   observed 148 T / 148 N | expected 148 T / 148 N  OK
+    GSE15852   observed 43 T / 43 N | expected 43 T / 43 N  OK
+
+  [SAVED] 15_probe_coverage.csv
+
+[3/5] Computing per-gene differential expression...
+  [SAVED] 15_microarray_concordance_full.csv
+
+  ── |log2FC| >= 0.3 ──
+
+  GSE70947 (Agilent, 148 T / 148 N)
+   gene expected observed log2FC   qval         class
+  CDKN3       Up       Up  1.875 <0.001         Match
+ PTP4A2       Up     Down -0.045 0.3740 Uninformative
+ PTP4A3       Up       Up  0.128 0.0794    Weak match
+ STYXL1       Up       Up  0.328 <0.001         Match
+   TNS1     Down     Down -1.896 <0.001         Match
+  DUSP6     Down     Down -0.729 <0.001         Match
+ CDC14B     Down     Down -0.907 <0.001         Match
+  EPM2A     Down     Down -0.485 <0.001         Match
+  DUSP1     Down     Down -1.193 <0.001         Match
+
+  GSE15852 (Affymetrix, 43 T / 43 N)
+   gene expected observed log2FC   qval         class
+  CDKN3       Up       Up  0.417 0.0304         Match
+ PTP4A2       Up     Down -0.025 0.6596 Uninformative
+ PTP4A3       Up     Down -0.155 0.3760 Uninformative
+ STYXL1       Up     Down -0.051 0.6596 Uninformative
+   TNS1     Down     Down -1.155 <0.001         Match
+  DUSP6     Down     Down -0.417 0.0363         Match
+ CDC14B     Down     Down -0.446 <0.001         Match
+  EPM2A     Down     Down -0.110 0.6506    Weak match
+  DUSP1     Down     Down -1.001 <0.001         Match
+
+[4/5] Summarising...
+
+  ── SUMMARY ──
+       threshold  dataset   platform n_tumour n_normal n_match n_weak n_divergent n_uninf n_absent n_concordant n_tested
+ |log2FC| >= 0.3 GSE15852 Affymetrix       43       43       5      1           0       3        0            6        9
+ |log2FC| >= 0.3 GSE70947    Agilent      148      148       7      1           0       1        0            8        9
+ full_pattern binom_p
+        FALSE  0.5080
+        FALSE  0.0391
+
+  [SAVED] 15_microarray_summary.csv
+
+[5/5] Generating figures...
+  [SAVED] Fig_15A_Microarray_Concordance 
+  [SAVED] Fig_15B_Platform_LogFC_Comparison 
+  [SAVED] 15_MICROARRAY_CONCORDANCE_REPORT.txt
+
+=============================================================
+ 15_microarray_direction_concordance.R COMPLETE
+ Runtime: 1.75 min
+=============================================================
+Done. Report: D:/MS_PHD_work/14_Cancers/Breast_Cancer/Task_A_BRCA/output/microarray_concordance/15_MICROARRAY_CONCORDANCE_REPORT.txt 
+           used  (Mb) gc trigger   (Mb)  max used   (Mb)
+Ncells  7515331 401.4   29850881 1594.3  46642001 2491.0
+Vcells 14469067 110.4  127376848  971.9 215745774 1646.1
+$out
+[1] FALSE
+
+$figures
+[1] FALSE
+
+$tables
+[1] FALSE
+
+$logs
+[1] FALSE
+
+=============================================================
+ 15_microarray_direction_concordance.R
+ Start : 2026-08-02 21:24:21.485217 
+=============================================================
+
+[1/5] Loading locked signature...
+  Signature: 9 genes (4 up, 5 down)
+  Up   : CDKN3, PTP4A2, PTP4A3, STYXL1 
+  Down : TNS1, DUSP6, CDC14B, EPM2A, DUSP1 
+
+[2/5] Loading microarray cohorts...
+  ── GSE70947 (Agilent) ──
+    SearchString preview:  cm016-normal ; cm022-normal 
+    Raw matrix: 62976 probes x 296 samples
+    Symbol column: 'GeneName'
+    Probes with a symbol: 62976 / 62976 (100.0%)
+    Unique gene symbols: 34948
+    Retained: 148 tumour, 148 normal
+    max = 18.4, already log2 intensity
+    Signature coverage: 9 / 9 genes
+  ── GSE15852 (Affymetrix) ──
+    SearchString preview:  normal bc0043n ; cancer bc0043t 
+    Raw matrix: 22283 probes x 86 samples
+    Symbol column: 'Gene symbol'
+    Probes with a symbol: 21156 / 22283 (94.9%)
+    Unique gene symbols: 13298
+    Retained: 43 tumour, 43 normal
+    max = 17930.0 > 100, applying log2(x+1)
+    Signature coverage: 9 / 9 genes
+
+  ── Sample count verification ──
+    GSE70947   observed 148 T / 148 N | expected 148 T / 148 N  OK
+    GSE15852   observed 43 T / 43 N | expected 43 T / 43 N  OK
+
+  [SAVED] 15_probe_coverage.csv
+
+[3/5] Computing per-gene differential expression...
+  [SAVED] 15_microarray_concordance_full.csv
+
+  ── |log2FC| >= 0.3 ──
+
+  GSE70947 (Agilent, 148 T / 148 N)
+   gene expected observed log2FC   qval         class
+  CDKN3       Up       Up  1.875 <0.001         Match
+ PTP4A2       Up     Down -0.045 0.3740 Uninformative
+ PTP4A3       Up       Up  0.128 0.0794    Weak match
+ STYXL1       Up       Up  0.328 <0.001         Match
+   TNS1     Down     Down -1.896 <0.001         Match
+  DUSP6     Down     Down -0.729 <0.001         Match
+ CDC14B     Down     Down -0.907 <0.001         Match
+  EPM2A     Down     Down -0.485 <0.001         Match
+  DUSP1     Down     Down -1.193 <0.001         Match
+
+  GSE15852 (Affymetrix, 43 T / 43 N)
+   gene expected observed log2FC   qval         class
+  CDKN3       Up       Up  0.417 0.0304         Match
+ PTP4A2       Up     Down -0.025 0.6596 Uninformative
+ PTP4A3       Up     Down -0.155 0.3760 Uninformative
+ STYXL1       Up     Down -0.051 0.6596 Uninformative
+   TNS1     Down     Down -1.155 <0.001         Match
+  DUSP6     Down     Down -0.417 0.0363         Match
+ CDC14B     Down     Down -0.446 <0.001         Match
+  EPM2A     Down     Down -0.110 0.6506    Weak match
+  DUSP1     Down     Down -1.001 <0.001         Match
+
+[4/5] Summarising...
+
+  ── SUMMARY ──
+       threshold  dataset   platform n_tumour n_normal n_match n_weak n_divergent n_uninf n_absent n_concordant n_tested
+ |log2FC| >= 0.3 GSE15852 Affymetrix       43       43       5      1           0       3        0            6        9
+ |log2FC| >= 0.3 GSE70947    Agilent      148      148       7      1           0       1        0            8        9
+ full_pattern binom_p
+        FALSE  0.5080
+        FALSE  0.0391
+
+  [SAVED] 15_microarray_summary.csv
+
+[5/5] Generating figures...
+  [SAVED] Fig_15A_Microarray_Concordance 
+  [SAVED] Fig_15B_Platform_LogFC_Comparison 
+  [SAVED] 15_MICROARRAY_CONCORDANCE_REPORT.txt
+
+=============================================================
+ 15_microarray_direction_concordance.R COMPLETE
+ Runtime: 2.1 min
+=============================================================
+Done. Report: D:/MS_PHD_work/14_Cancers/Breast_Cancer/Task_A_BRCA/output/microarray_concordance/15_MICROARRAY_CONCORDANCE_REPORT.txt 

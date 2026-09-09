@@ -1,0 +1,70 @@
+============================================================
+ 11_intergene_correlation.R
+ Start : 2026-08-12 16:35:53.604288 
+============================================================
+
+[1/1] Inter-gene correlation heatmap
+  Signature genes: CDKN3, DUSP1, DUSP6, EPM2A, TNS1, PTP4A3, CDC14B, PTP4A2, STYXL1 
+  Tumour samples: 1106 × 9 genes
+
+  ── Critical |rho| thresholds ──
+    n = 1106 samples, 36 pairwise tests, alpha = 0.05
+    Nominal   p < 0.05  reached at |rho| >= 0.0589
+    BH-adj    q < 0.05  reached at |rho| >= 0.0718  (p <= 0.0169)
+    empirical, from 25 of 36 pairs surviving correction
+    NOTE: both thresholds are far below the pre-specified magnitude
+          bands (moderate >= 0.3, strong >= 0.5). Statistical
+          significance is therefore not the limiting criterion here.
+    Spearman-corrected nominal threshold: |rho| >= 0.0607
+
+  [SAVED] 11A_inter_gene_correlation_pairwise.csv       (36 rows) -> D:/MS_PHD_work/14_Cancers/Breast_Cancer/GSEA_&_intergene_correlation/output_intergene_correlation/tables/11A_inter_gene_correlation_pairwise.csv
+
+  ── Magnitude bands across all 36 pairs ──
+ magnitude n_pairs  pct
+  Moderate       5 13.9
+    Strong       1  2.8
+      Weak      30 83.3
+
+  Pairs with q < 0.05: 25 of 36 (69.4%)
+  NOTE: high significance rate reflects sample size, not co-regulation.
+        Interpret by magnitude, not by significance.
+
+  ── Strongest pairs (|rho| >= 0.3) ──
+ Gene1  Gene2   rho  q_value magnitude
+  TNS1 CDC14B 0.580 6.36e-99    Strong
+ DUSP1   TNS1 0.474 7.54e-62  Moderate
+ DUSP6 CDC14B 0.436 1.44e-51  Moderate
+ EPM2A CDC14B 0.407 2.20e-44  Moderate
+ DUSP6   TNS1 0.379 3.19e-38  Moderate
+ DUSP1  DUSP6 0.369 3.35e-36  Moderate
+
+  [SAVED] 11A_inter_gene_correlation.csv                (9x9) -> D:/MS_PHD_work/14_Cancers/Breast_Cancer/GSEA_&_intergene_correlation/output_intergene_correlation/tables/11A_inter_gene_correlation.csv
+  [SAVED] 11A_inter_gene_pvalues.csv                    (9x9) -> D:/MS_PHD_work/14_Cancers/Breast_Cancer/GSEA_&_intergene_correlation/output_intergene_correlation/tables/11A_inter_gene_pvalues.csv
+  [SAVED] 11A_inter_gene_qvalues.csv                    (9x9) -> D:/MS_PHD_work/14_Cancers/Breast_Cancer/GSEA_&_intergene_correlation/output_intergene_correlation/tables/11A_inter_gene_qvalues.csv
+  [SAVED] 11A_correlation_magnitude_summary.csv         (3 rows) -> D:/MS_PHD_work/14_Cancers/Breast_Cancer/GSEA_&_intergene_correlation/output_intergene_correlation/tables/11A_correlation_magnitude_summary.csv
+  [SAVED] 11A_analysis_parameters.csv                   (14 rows) -> D:/MS_PHD_work/14_Cancers/Breast_Cancer/GSEA_&_intergene_correlation/output_intergene_correlation/tables/11A_analysis_parameters.csv
+  [SAVED] Fig_InterGene_Correlation_Half 
+
+=============================================================
+ OUTPUT MANIFEST
+=============================================================
+
+ TABLES  (D:/MS_PHD_work/14_Cancers/Breast_Cancer/GSEA_&_intergene_correlation/output_intergene_correlation/tables)
+   [OK]      11A_inter_gene_correlation.csv                0.7 KB
+   [OK]      11A_inter_gene_pvalues.csv                    0.7 KB
+   [OK]      11A_inter_gene_qvalues.csv                    0.7 KB
+   [OK]      11A_inter_gene_correlation_pairwise.csv       2.6 KB
+   [OK]      11A_correlation_magnitude_summary.csv         0.1 KB
+   [OK]      11A_analysis_parameters.csv                   0.4 KB
+
+ FIGURES  (D:/MS_PHD_work/14_Cancers/Breast_Cancer/GSEA_&_intergene_correlation/output_intergene_correlation/figures)
+   [OK]      Fig_InterGene_Correlation_Half.png            170.8 KB
+   [OK]      Fig_InterGene_Correlation_Half.tiff           856.6 KB
+   [OK]      Fig_InterGene_Correlation_Half.pdf            49.8 KB
+
+ All expected outputs written successfully.
+
+=============================================================
+ 11_intergene_correlation.R  COMPLETE
+ End: 2026-08-12 16:36:12.771626 
+=============================================================

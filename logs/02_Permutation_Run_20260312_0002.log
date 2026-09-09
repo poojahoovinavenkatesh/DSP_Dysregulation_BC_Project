@@ -1,0 +1,55 @@
+=============================================================
+ 03_permutation_test.R
+ Start       : 2026-03-12 00:02:16.977468 
+ Permutations: 1000 
+ Recovery mode: FALSE 
+=============================================================
+
+[1/5] Loading artefacts...
+  True AUC: 0.9967   CI [ 0.9962 , 0.9972 ]
+  Stable genes: 9 
+
+  Loading TCGA-BRCA data...
+  Samples: 1219 | Tumor: 1106 | Normal: 113 
+
+[2/5] Running 1000 permutations...
+  Using 14 cores
+  [SAVED] 03_perm_results_raw.rds  (crash guard)
+
+[3/5] Summarising permutation results...
+  Total permutations: 1000 
+  Successful        : 1000 
+  NA (failed folds) : 0 
+  Errors            : 0 
+
+  True AUC    : 0.9967  [0.9962 – 0.9972]
+  Null AUC    : mean = 0.4976  SD = 0.0357  95th pct = 0.5543
+  Z-score     : 13.982
+  Empirical p : 0.000999  (p < 0.001)
+  [SAVED] Permutation_Test_Results.csv
+  [SAVED] Permutation_Null_AUC_Vector.rds
+
+[4/5] Generating figures...
+  [SAVED] Fig_Perm_1_NullDistribution (PNG + TIFF 600dpi + PDF)
+  [SAVED] Fig_Perm_2_Convergence (PNG + TIFF 600dpi + PDF)
+  [SAVED] Fig_Perm_3_Combined (PNG + TIFF 600dpi + PDF)
+
+[5/5] Session info...
+
+=============================================================
+ 03_permutation_test.R  COMPLETE
+ End    : 2026-03-12 07:26:12.921193 
+ Runtime: 443.93 minutes
+
+ RESULT: True AUC = 0.9967  |  Empirical p = 0.000999  (p < 0.001)
+
+ SAVED ARTEFACTS:
+  Tables  : Permutation_Test_Results.csv
+            Permutation_Null_AUC_Vector.rds
+            03_perm_results_raw.rds  (crash guard)
+  Figures : Fig_Perm_1_NullDistribution.*
+            Fig_Perm_2_Convergence.*
+            Fig_Perm_3_Combined.*  (PNG + TIFF 600dpi + PDF)
+  Logs    : 03_Permutation_Run_[timestamp].log
+            03_session_info.txt
+=============================================================

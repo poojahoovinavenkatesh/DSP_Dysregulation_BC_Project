@@ -1,0 +1,269 @@
+=============================================================
+ 13_pattern_conservation.R
+ Start : 2026-08-14 15:53:24.110281 
+=============================================================
+
+[1/6] Loading GEPIA differential expression matrix...
+  Rows: 731 | Columns: CancerType, name, ens_id, log2FC, aveEXP, t, p-value, q-value
+  Cancer types: 23 | Unique genes: 45
+
+  [WARN] Cancer types with incomplete gene coverage:
+ cancer n_genes
+   BLCA       8
+   CESC       6
+   CHOL       8
+   ESCA       8
+    GBM       7
+   HNSC       8
+   PAAD       2
+   PCPG       7
+   READ       7
+   SARC       1
+   STAD       6
+
+[2/6] Loading sample sizes and applying cohort exclusions...
+  Sample metadata for 31 cancer types
+
+  ── EXCLUDED COHORTS ──
+ cancer n_tumour n_tcga_norm n_gtex_norm n_normal_total                exclude_reason
+   CHOL       36           9           0              9 insufficient normals (9 < 10)
+   PCPG      184           3           0              3 insufficient normals (3 < 10)
+   THYM      124           2           0              2 insufficient normals (2 < 10)
+
+  Cancers retained: 28 of 31
+
+[3/6] Classifying gene-by-cancer directional concordance...
+  [SAVED] 13_gene_classification_full.csv
+
+[4/6] Summarising per cancer type...
+
+  ── q < 0.05 ──
+  Cancers reproducing the FULL 9-gene pattern: BRCA
+
+  Top 10 by Match count:
+ cancer n_tumour n_normal_total n_match n_weak n_divergent n_concordant binom_q
+   BRCA     1108            354       9      0           0            9  0.0391
+   KIRP      292             98       8      0           0            8  0.1120
+   LIHC      379            200       8      0           0            8  0.1120
+   PRAD      499            189       8      0           1            8  0.1120
+   UCEC      548            140       7      1           1            8  0.1120
+   KICH       66             63       7      0           1            7  0.3270
+   LUAD      522            501       6      3           0            9  0.0391
+   LUSC      506            501       6      1           2            7  0.3270
+   BLCA      413             36       6      0           1            6  0.5970
+   ESCA      186            358       6      0           2            6  0.5970
+
+  ── q < 0.10 ──
+  Cancers reproducing the FULL 9-gene pattern: BRCA
+
+  Top 10 by Match count:
+ cancer n_tumour n_normal_total n_match n_weak n_divergent n_concordant binom_q
+   BRCA     1108            354       9      0           0            9  0.0391
+   KIRP      292             98       8      0           0            8  0.1120
+   LIHC      379            200       8      0           0            8  0.1120
+   PRAD      499            189       8      0           1            8  0.1120
+   UCEC      548            140       7      1           1            8  0.1120
+   KICH       66             63       7      0           1            7  0.3270
+   LUAD      522            501       6      3           0            9  0.0391
+   LUSC      506            501       6      1           2            7  0.3270
+   BLCA      413             36       6      0           1            6  0.5970
+   ESCA      186            358       6      0           2            6  0.5970
+
+  [SAVED] 13_cancer_summary.csv
+
+[5/6] Per-gene conservation across cancer types...
+
+  (reference cancer BRCA excluded — 9/9 by construction)
+
+  ── q < 0.05 ──
+   gene direction n_match n_weak n_divergent n_cancers
+  CDKN3        Up      18      0           0        19
+  EPM2A      Down      17      0           0        17
+   TNS1      Down      15      0           1        16
+  DUSP1      Down      14      1           1        17
+ STYXL1        Up      12      4           0        16
+ PTP4A3        Up      11      0           5        16
+ CDC14B      Down       8      4           0        13
+  DUSP6      Down       6      2           5        14
+ PTP4A2        Up       0      3           5        15
+
+  ── q < 0.10 ──
+   gene direction n_match n_weak n_divergent n_cancers
+  CDKN3        Up      18      0           0        19
+  EPM2A      Down      17      0           0        17
+  DUSP1      Down      15      0           2        17
+   TNS1      Down      15      0           1        16
+ STYXL1        Up      13      3           0        16
+ PTP4A3        Up      11      0           5        16
+ CDC14B      Down       8      4           0        13
+  DUSP6      Down       6      2           5        14
+ PTP4A2        Up       0      3           5        15
+
+  [SAVED] 13_gene_conservation.csv
+
+[6/6] Generating figures...
+  [SAVED] Fig_13A_Sign_Matrix_q005 
+  [SAVED] Fig_13B_Cancer_Concordance_q005 
+  [SAVED] Fig_13C_Gene_Conservation_q005 
+  [SAVED] Fig_13A_Sign_Matrix_q010 
+  [SAVED] Fig_13B_Cancer_Concordance_q010 
+  [SAVED] Fig_13C_Gene_Conservation_q010 
+
+  [SAVED] 13_PATTERN_CONSERVATION_REPORT.txt
+
+=============================================================
+ 13_pattern_conservation.R COMPLETE
+ Runtime: 0.09 min
+=============================================================
+igures...
+  [SAVED] Fig_13A_Sign_Matrix_q005 
+  [SAVED] Fig_13B_Cancer_Concordance_q005 
+  [SAVED] Fig_13C_Gene_Conservation_q005 
+  [SAVED] Fig_13A_Sign_Matrix_q010 
+  [SAVED] Fig_13B_Cancer_Concordance_q010 
+  [SAVED] Fig_13C_Gene_Conservation_q010 
+
+  [SAVED] 13_PATTERN_CONSERVATION_REPORT.txt
+
+=============================================================
+ 13_pattern_conservation.R COMPLETE
+ Runtime: 0.09 min
+=============================================================
+Done. Report: D:/MS_PHD_work/14_Cancers/Breast_Cancer/signature_concordance/output/pattern_conservation/13_PATTERN_CONSERVATION_REPORT.txt 
+          used (Mb) gc trigger  (Mb) max used  (Mb)
+Ncells 1646246 88.0    2762344 147.6  2762344 147.6
+Vcells 3631817 27.8    8388608  64.0  5151738  39.4
+$out
+[1] FALSE
+
+$figures
+[1] FALSE
+
+$tables
+[1] FALSE
+
+$logs
+[1] FALSE
+
+=============================================================
+ 13_pattern_conservation.R
+ Start : 2026-08-14 16:07:07.033834 
+=============================================================
+
+[1/6] Loading GEPIA differential expression matrix...
+  Rows: 731 | Columns: CancerType, name, ens_id, log2FC, aveEXP, t, p-value, q-value
+  Cancer types: 23 | Unique genes: 45
+
+  [WARN] Cancer types with incomplete gene coverage:
+ cancer n_genes
+   BLCA       8
+   CESC       6
+   CHOL       8
+   ESCA       8
+    GBM       7
+   HNSC       8
+   PAAD       2
+   PCPG       7
+   READ       7
+   SARC       1
+   STAD       6
+
+[2/6] Loading sample sizes and applying cohort exclusions...
+  Sample metadata for 25 cancer types
+
+  ── EXCLUDED COHORTS ──
+ cancer n_tumour n_tcga_norm n_gtex_norm n_normal_total                exclude_reason
+   CESC      310           3           0              3 insufficient normals (3 < 10)
+   CHOL       36           9           0              9 insufficient normals (9 < 10)
+    GBM      607           6           0              6 insufficient normals (6 < 10)
+   PCPG      184           3           0              3 insufficient normals (3 < 10)
+   SARC      265           6           0              6 insufficient normals (6 < 10)
+   SKCM      474           2           0              2 insufficient normals (2 < 10)
+   THYM      124           2           0              2 insufficient normals (2 < 10)
+
+  Cancers retained: 18 of 25
+
+[3/6] Classifying gene-by-cancer directional concordance...
+  [SAVED] 13_gene_classification_full.csv
+
+[4/6] Summarising per cancer type...
+
+  ── q < 0.05 ──
+  Cancers reproducing the FULL 9-gene pattern: BRCA
+
+  Top 10 by Match count:
+ cancer n_tumour n_normal_total n_match n_weak n_divergent n_concordant binom_q
+   BRCA     1108            133       9      0           0            9  0.0332
+   KIRP      292             60       8      0           0            8  0.1110
+   LIHC      379             59       8      0           0            8  0.1110
+   PRAD      499             67       8      0           1            8  0.1110
+   UCEC      548             47       7      1           1            8  0.1110
+   KICH       66             25       7      0           1            7  0.3050
+   LUAD      522            120       6      3           0            9  0.0332
+   LUSC      506            120       6      1           2            7  0.3050
+   BLCA      413             23       6      0           1            6  0.5400
+   ESCA      186             18       6      0           2            6  0.5400
+
+  ── q < 0.10 ──
+  Cancers reproducing the FULL 9-gene pattern: BRCA
+
+  Top 10 by Match count:
+ cancer n_tumour n_normal_total n_match n_weak n_divergent n_concordant binom_q
+   BRCA     1108            133       9      0           0            9  0.0332
+   KIRP      292             60       8      0           0            8  0.1110
+   LIHC      379             59       8      0           0            8  0.1110
+   PRAD      499             67       8      0           1            8  0.1110
+   UCEC      548             47       7      1           1            8  0.1110
+   KICH       66             25       7      0           1            7  0.3050
+   LUAD      522            120       6      3           0            9  0.0332
+   LUSC      506            120       6      1           2            7  0.3050
+   BLCA      413             23       6      0           1            6  0.5400
+   ESCA      186             18       6      0           2            6  0.5400
+
+  [SAVED] 13_cancer_summary.csv
+
+[5/6] Per-gene conservation across cancer types...
+
+  (reference cancer BRCA excluded — 9/9 by construction)
+
+  ── q < 0.05 ──
+   gene direction n_match n_weak n_divergent n_cancers
+  CDKN3        Up      15      0           0        16
+  EPM2A      Down      15      0           0        15
+  DUSP1      Down      14      0           1        15
+   TNS1      Down      14      0           1        15
+ PTP4A3        Up      10      0           4        14
+ STYXL1        Up      10      4           0        14
+ CDC14B      Down       8      4           0        13
+  DUSP6      Down       6      2           4        13
+ PTP4A2        Up       0      3           4        14
+
+  ── q < 0.10 ──
+   gene direction n_match n_weak n_divergent n_cancers
+  CDKN3        Up      15      0           0        16
+  EPM2A      Down      15      0           0        15
+  DUSP1      Down      14      0           1        15
+   TNS1      Down      14      0           1        15
+ STYXL1        Up      11      3           0        14
+ PTP4A3        Up      10      0           4        14
+ CDC14B      Down       8      4           0        13
+  DUSP6      Down       6      2           4        13
+ PTP4A2        Up       0      3           4        14
+
+  [SAVED] 13_gene_conservation.csv
+
+[6/6] Generating figures...
+  [SAVED] Fig_13A_Sign_Matrix_q005 
+  [SAVED] Fig_13B_Cancer_Concordance_q005 
+  [SAVED] Fig_13C_Gene_Conservation_q005 
+  [SAVED] Fig_13A_Sign_Matrix_q010 
+  [SAVED] Fig_13B_Cancer_Concordance_q010 
+  [SAVED] Fig_13C_Gene_Conservation_q010 
+
+  [SAVED] 13_PATTERN_CONSERVATION_REPORT.txt
+
+=============================================================
+ 13_pattern_conservation.R COMPLETE
+ Runtime: 0.08 min
+=============================================================
+Done. Report: D:/MS_PHD_work/14_Cancers/Breast_Cancer/signature_concordance/output/pattern_conservation/13_PATTERN_CONSERVATION_REPORT.txt 

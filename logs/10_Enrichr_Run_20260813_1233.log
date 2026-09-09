@@ -1,0 +1,82 @@
+=============================================================
+ 10_enrichr_dotplot.R
+ Start  : 2026-08-13 12:33:19.093529 
+ FDR    : 0.05 
+ Top N  : 8 per library × geneset
+=============================================================
+
+[1/5] Discovering and loading Enrichr files...
+  Found 6 files
+  Parsed: 6 files
+
+  Total rows loaded: 187
+  Significant (FDR < 0.05): 102
+
+  ── Per-file summary ──
+# A tibble: 6 × 5
+  GeneSet Library                Total Significant   Min_FDR
+  <chr>   <chr>                  <int>       <int>     <dbl>
+1 All9    BioPlanet_2019            42          18 0.000272 
+2 All9    Reactome_Pathways_2024    51          12 0.00231  
+3 Down    BioPlanet_2019            39          31 0.0000701
+4 Down    Reactome_Pathways_2024    48          37 0.000606 
+5 Up      BioPlanet_2019             4           3 0.0000303
+6 Up      Reactome_Pathways_2024     3           1 0.0388   
+
+  [SAVED] 10_Enrichr_combined_long.csv
+
+[2/5] Auto-detecting top pathways for plotting...
+  Top hits per (geneset × library, n=8): 36 rows
+  Unique pathways to plot: 21
+  Plot dataframe: 42 rows
+
+  [SAVED] 10_Enrichr_top_pathways_plotted.csv
+
+  [SAVED] 10_Enrichr_significant_only.csv (102 rows)
+
+[3/5] Ordering pathways by GeneSet specificity...
+[4/5] Building dot plot...
+  [SAVED] Fig_10A_Enrichr_Dotplot (PNG 300dpi + TIFF 600dpi + PDF)
+
+[5/5] Rank-based directionality analysis...
+  [SAVED] 10_pathway_rank_specificity.csv
+  [SAVED] 10_directionality_summary.csv
+
+  ── Rank-based directionality summary ──
+                 Library     Direction n_pathways  pct
+1         BioPlanet_2019 DOWN-specific         31 91.2
+2         BioPlanet_2019   UP-specific          3  8.8
+3 Reactome_Pathways_2024 DOWN-specific         37 97.4
+4 Reactome_Pathways_2024   UP-specific          1  2.6
+  [SAVED] Fig_10C_Pathway_Directionality (PNG 300dpi + TIFF 600dpi + PDF)
+  [SAVED] Fig_10E_Top5_Per_Direction (PNG 300dpi + TIFF 600dpi + PDF)
+
+  ── Direction summary ──
+                 Library     Direction n_pathways  pct
+1         BioPlanet_2019 DOWN-specific         31 91.2
+2         BioPlanet_2019   UP-specific          3  8.8
+3 Reactome_Pathways_2024 DOWN-specific         37 97.4
+4 Reactome_Pathways_2024   UP-specific          1  2.6
+
+[6/6] Writing standalone results report...
+  [SAVED] 10_ENRICHR_RESULTS_REPORT.txt
+  [SAVED] 10_session_info.txt
+
+
+=============================================================
+ 10_enrichr_dotplot.R  COMPLETE
+ End    : 2026-08-13 12:33:23.650344 
+ Runtime: 0.08 minutes
+
+ SAVED ARTEFACTS:
+  Tables  : 10_Enrichr_combined_long.csv
+            10_Enrichr_significant_only.csv
+            10_Enrichr_top_pathways_plotted.csv
+            10_pathway_rank_specificity.csv
+            10_directionality_summary.csv
+  Figures : Fig_10A_Enrichr_Dotplot
+            Fig_10C_Pathway_Directionality
+            Fig_10E_Top5_Per_Direction
+  Report  : 10_ENRICHR_RESULTS_REPORT.txt
+  Log     : 10_Enrichr_Run_20260813_1233.log 
+=============================================================

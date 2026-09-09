@@ -1,0 +1,52 @@
+=============================================================
+ 01_training_pipeline.R
+ Start  : 2026-03-12 16:16:24.561383 
+ Seed   : 42 
+ Folds  : 5 × repeats 20 = 100 total folds
+=============================================================
+
+[1/9] Loading and formatting data...
+  Gene list loaded: 32 candidate genes
+  Samples loaded: 1219 | Tumor: 1106 | Normal: 113 | Genes: 32 
+  Class ratio (T/N): 9.788 
+
+  [SAVED] output/tables/01_master_data_snapshot.rds
+
+[2/9] Generating UMAP and t-SNE projections...
+  [SAVED] Fig01A_UMAP (PNG 300dpi + TIFF 600dpi + PDF vector)
+  [SAVED] Fig01B_tSNE (PNG 300dpi + TIFF 600dpi + PDF vector)
+
+[3/9] Running Repeated Nested CV ( 100 folds)...
+  Using 14 cores of 16 detected
+  Parallel CV complete.
+  Results: Success = 100 | Errors = 0 
+
+[4/9] Computing performance metrics and gene stability...
+  Nested CV AUC: 0.9967 ± 0.0027 SD
+  Stable genes (≥ 0.8 ): 9 
+  [SAVED] Fig01D_Feature_Stability (PNG 300dpi + TIFF 600dpi + PDF vector)
+  [SAVED] Fig01C_Calibration (PNG 300dpi + TIFF 600dpi + PDF vector)
+  [SAVED] Fig01E_Nested_CV_ROC (PNG 300dpi + TIFF 600dpi + PDF vector)
+
+[5/9] Generating UpSet plot...
+  [SAVED] Feature_Selection_Summary.txt
+  [SAVED] Fig02_UpSet (PNG + TIFF + PDF)
+
+[6/9] Training final Bayesian-optimised XGBoost...
+
+=============================================================
+ 01_training_pipeline.R  COMPLETE
+ End   : 2026-03-12 16:25:23.019291 
+ Runtime: 8.97 minutes
+
+ SAVED ARTEFACTS:
+  Models  : final_xgboost_model_Bayesian.rds, final_preProc_scaler.rds
+  Tables  : Final_Directional_Signature.rds/.csv
+            Gene_Bootstrap_Stability.csv, Model_Performance_Summary.csv
+            Feature_Selection_Summary.txt, Biological_Validation_DE_Results.csv
+            01_master_data_snapshot.rds, 01_upset_gene_lists.rds
+  Figures : Fig01A_UMAP, Fig01B_tSNE, Fig01C_Calibration, Fig01D_Feature_Stability,
+            Fig01E_Nested_CV_ROC, Fig02_UpSet, Fig03_Diagnostic_ROC,
+            Fig03B_Directional_Diagnostic_ROC, Fig03C_XGB_vs_Dir_ROC_Overlay,
+            Fig04A_SHAP_Beeswarm, Fig04B_SHAP_Importance_Bar, Fig04C_SHAP_Dependence_[GENE]
+=============================================================

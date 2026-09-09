@@ -1,0 +1,234 @@
+=============================================================
+ 02_external_validation.R
+ Start   : 2026-03-11 23:50:54.002246 
+ Datasets: 2 
+=============================================================
+
+[1/5] Loading locked diagnostic engine...
+  Genes: CDKN3, DUSP1, DUSP6, EPM2A, TNS1, PTP4A3, CDC14B, PTP4A2, STYXL1 
+  Up in Tumour   : CDKN3, PTP4A2, PTP4A3, STYXL1 
+  Down in Tumour : TNS1, DUSP6, CDC14B, EPM2A, DUSP1 
+
+[2/5] Validating all datasets...
+
+──────────────────────────────────────────────
+Dataset: GSE233242 
+  Tumor: 43 | Normal: 43 
+  Matched samples: 84 
+  Max = 1649 → applying log2(TPM+1)
+  Gene coverage: 9 / 9 
+  XGBoost AUC        : 0.9629 [0.9214–1.0000]
+  Directional AUC    : 0.9501 [0.8991–1.0000]
+  DeLong (XGB vs Dir): p = 0.1127
+  [SAVED] Validation_Summary_GSE233242.csv
+  [SAVED] Fig_Val_ROC_GSE233242 (PNG 300dpi + TIFF 600dpi + PDF)
+  [SAVED] Fig_Val_ScoreDist_GSE233242 (PNG 300dpi + TIFF 600dpi + PDF)
+  [SAVED] Fig_Val_Heatmap_GSE233242 (PNG + TIFF)
+──────────────────────────────────────────────
+Dataset: GSE58135 
+  Tumor: 84 | Normal: 56 
+  Matched samples: 140 
+  Max = 1921 → applying log2(TPM+1)
+  Gene coverage: 9 / 9 
+  XGBoost AUC        : 0.9991 [0.9973–1.0000]
+  Directional AUC    : 0.9962 [0.9910–1.0000]
+  DeLong (XGB vs Dir): p = 0.2635
+  [SAVED] Validation_Summary_GSE58135.csv
+  [SAVED] Fig_Val_ROC_GSE58135 (PNG 300dpi + TIFF 600dpi + PDF)
+  [SAVED] Fig_Val_ScoreDist_GSE58135 (PNG 300dpi + TIFF 600dpi + PDF)
+  [SAVED] Fig_Val_Heatmap_GSE58135 (PNG + TIFF)
+
+  Completed: 2 / 2 datasets
+
+[3/5] Combined ROC plots...
+  [SAVED] Fig_Val_Combined_ROC_XGBoost (PNG 300dpi + TIFF 600dpi + PDF)
+  [SAVED] Fig_Val_Combined_ROC_Directional (PNG 300dpi + TIFF 600dpi + PDF)
+[4/5] Saving combined summary...
+  [SAVED] Validation_Summary_ALL_Datasets.csv
+  [SAVED] 02_all_validation_results.rds
+
+  [SAVED] Fig_Val_AUC_Comparison (PNG 300dpi + TIFF 600dpi + PDF)
+
+  ── Combined Validation Performance ──
+            Dataset N_Total XGB_AUC XGB_CI_Lo XGB_CI_Hi Dir_AUC Dir_CI_Lo Dir_CI_Hi
+GSE233242 GSE233242      84  0.9629    0.9214         1  0.9501    0.8991         1
+GSE58135   GSE58135     140  0.9991    0.9973         1  0.9962    0.9910         1
+          DeLong_P_XGBvsDir
+GSE233242            0.1127
+GSE58135             0.2635
+[5/5] Session info...
+
+=============================================================
+ 02_external_validation.R  COMPLETE
+ Runtime: 2.6 mins
+
+ SAVED ARTEFACTS:
+  Tables  : Validation_Summary_[dataset].csv (one per dataset)
+            Validation_Summary_ALL_Datasets.csv
+            02_all_validation_results.rds
+  Figures : Fig_Val_ROC_[dataset].*         (XGBoost + Directional overlay)
+            Fig_Val_ScoreDist_[dataset].*   (violin + score distributions)
+            Fig_Val_Heatmap_[dataset].*     (with directional row annotation)
+            Fig_Val_Combined_ROC_XGBoost.*
+            Fig_Val_Combined_ROC_Directional.*
+            Fig_Val_AUC_Comparison.*        (XGBoost vs Directional bar)
+            (PNG 300dpi + TIFF 600dpi + PDF for each)
+  Logs    : 02_Validation_Run_[timestamp].log
+            02_session_info.txt
+            Mapping_Log_[dataset].csv
+            Gene_Coverage_[dataset].csv
+=============================================================
+           used  (Mb) gc trigger   (Mb)  max used   (Mb)
+Ncells  9666367 516.3   29222430 1560.7  29222430 1560.7
+Vcells 19610625 149.7   93199263  711.1 227536100 1736.0
+$figures
+[1] TRUE
+
+$tables
+[1] FALSE
+
+$logs
+[1] TRUE
+
+=============================================================
+ 04_organ_specificity.R
+ Start  : 2026-03-12 15:21:00.22442 
+ Cohorts: 6 
+=============================================================
+
+[1/7] Loading locked diagnostic engine...
+  Genes: CDKN3, DUSP1, DUSP6, EPM2A, TNS1, PTP4A3, CDC14B, PTP4A2, STYXL1 
+  Up in Tumour   : CDKN3, PTP4A2, PTP4A3, STYXL1 
+  Down in Tumour : TNS1, DUSP6, CDC14B, EPM2A, DUSP1 
+
+[2/7] Loading Breast cohort (code-01 tumours)...
+  Loading Breast from TCGA-BRCA.star_tpm.tsv.gz ...
+  Breast tumour samples: 1106 
+
+[3/7] Loading non-breast cohorts...
+  Loading Lung from TCGA-LUAD.star_tpm.tsv.gz ...
+  Loading Kidney from TCGA-KIRC.star_tpm.tsv.gz ...
+  Loading Colon from TCGA-COAD.star_tpm.tsv.gz ...
+  Loading Glioblastoma from TCGA-GBM.star_tpm.tsv.gz ...
+  Loading Prostate from TCGA-PRAD.star_tpm.tsv.gz ...
+  Loading Melanoma from TCGA-SKCM.star_tpm.tsv.gz ...
+
+  Cohorts loaded: 7 
+  [SAVED] OrgSpec_Gene_Coverage.csv
+
+                   Cohort N_Samples N_Genes_Present N_Genes_Imputed
+Breast             Breast      1106               9               0
+Lung                 Lung       528               9               0
+Kidney             Kidney       537               9               0
+Colon               Colon       471               9               0
+Glioblastoma Glioblastoma       157               9               0
+Prostate         Prostate       501               9               0
+Melanoma         Melanoma       103               9               0
+[4/7] Building combined predictions...
+  [SAVED] OrgSpec_All_Predictions.csv
+
+# A tibble: 7 × 5
+  Cohort           N Mean_XGB Mean_Dir_Raw Mean_Dir_Scaled
+  <fct>        <int>    <dbl>        <dbl>           <dbl>
+1 Breast        1106    0.982        1.45            0.600
+2 Lung           528    0.832       -1.92            0.487
+3 Kidney         537    0.414       -8.98            0.251
+4 Colon          471    0.991        2.67            0.640
+5 Glioblastoma   157    0.962       -1.33            0.507
+6 Prostate       501    0.719       -2.45            0.470
+7 Melanoma       103    0.944        0.786           0.578
+
+[5/7] Per-cancer AUC (both scores)...
+  Breast vs Lung            XGB=0.8273  Dir=0.7315  DeLong p=<0.001
+  Breast vs Kidney          XGB=0.9751  Dir=0.9723  DeLong p=0.2698
+  Breast vs Colon           XGB=0.6084  Dir=0.4048  DeLong p=<0.001
+  Breast vs Glioblastoma    XGB=0.8132  Dir=0.7291  DeLong p=<0.001
+  Breast vs Prostate        XGB=0.9256  Dir=0.7700  DeLong p=<0.001
+  Breast vs Melanoma        XGB=0.8338  Dir=0.5549  DeLong p=<0.001
+  [SAVED] OrgSpec_PerCancer_AUC.csv
+  [SAVED] OrgSpec_Wilcoxon_Results.csv
+  [SAVED] OrgSpec_Summary_Stats.csv
+  [SAVED] OrgSpec_Results_Object.rds
+
+[6/7] Generating figures...
+  [SAVED] Fig_OrgSpec_1_Violin_BothScores (PNG 300dpi + TIFF 600dpi + PDF)
+  [SAVED] Fig_OrgSpec_2_ForestPlot_BothScores (PNG 300dpi + TIFF 600dpi + PDF)
+  [SAVED] Fig_OrgSpec_3_MeanScore_BothMethods (PNG 300dpi + TIFF 600dpi + PDF)
+  [SAVED] Fig_OrgSpec_4_Overall_ROC_BothScores (PNG 300dpi + TIFF 600dpi + PDF)
+
+[7/7] Session info...
+
+=============================================================
+ 04_organ_specificity.R  COMPLETE
+ Runtime: 0.81 mins
+
+ SAVED ARTEFACTS:
+  Tables  : OrgSpec_Gene_Coverage.csv
+            OrgSpec_All_Predictions.csv  (XGB + Directional scores)
+            OrgSpec_PerCancer_AUC.csv    (both scores per cancer type)
+            OrgSpec_Wilcoxon_Results.csv (both scores, BH-FDR)
+            OrgSpec_Summary_Stats.csv
+            OrgSpec_Results_Object.rds
+  Figures : Fig_OrgSpec_1_Violin_BothScores.*
+            Fig_OrgSpec_2_ForestPlot_BothScores.*
+            Fig_OrgSpec_3_MeanScore_BothMethods.*
+            Fig_OrgSpec_4_Overall_ROC_BothScores.*
+            (PNG 300dpi + TIFF 600dpi + PDF for each)
+  Logs    : 04_OrgSpec_Run_[timestamp].log
+            04_session_info.txt
+=============================================================
+           used  (Mb) gc trigger   (Mb)  max used   (Mb)
+Ncells  9702131 518.2   29222430 1560.7  29222430 1560.7
+Vcells 19708603 150.4  158858013 1212.0 248213027 1893.8
+$data
+[1] FALSE
+
+$output
+[1] FALSE
+
+$figures
+[1] FALSE
+
+$tables
+[1] FALSE
+
+$models
+[1] FALSE
+
+$logs
+[1] FALSE
+
+=============================================================
+ 01_training_pipeline.R
+ Start  : 2026-03-12 15:52:15.230857 
+ Seed   : 42 
+ Folds  : 5 × repeats 20 = 100 total folds
+=============================================================
+
+[1/9] Loading and formatting data...
+  Gene list loaded: 32 candidate genes
+  Samples loaded: 1219 | Tumor: 1106 | Normal: 113 | Genes: 32 
+  Class ratio (T/N): 9.788 
+
+  [SAVED] output/tables/01_master_data_snapshot.rds
+
+[2/9] Generating UMAP and t-SNE projections...
+  [SAVED] Fig01A_UMAP (PNG 300dpi + TIFF 600dpi + PDF vector)
+  [SAVED] Fig01B_tSNE (PNG 300dpi + TIFF 600dpi + PDF vector)
+
+[3/9] Running Repeated Nested CV ( 100 folds)...
+  Using 14 cores of 16 detected
+  Parallel CV complete.
+  Results: Success = 100 | Errors = 0 
+
+[4/9] Computing performance metrics and gene stability...
+  Nested CV AUC: 0.9967 ± 0.0027 SD
+  Stable genes (≥ 0.8 ): 9 
+  [SAVED] Fig01D_Feature_Stability (PNG 300dpi + TIFF 600dpi + PDF vector)
+  [SAVED] Fig01E_Nested_CV_ROC (PNG 300dpi + TIFF 600dpi + PDF vector)
+
+[5/9] Generating UpSet plot...
+  [SAVED] Feature_Selection_Summary.txt
+  [SAVED] Fig02_UpSet (PNG + TIFF + PDF)
+
+[6/9] Training final Bayesian-optimised XGBoost...

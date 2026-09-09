@@ -1,0 +1,76 @@
+=============================================================
+ 16_hallmark_membership.R
+ Start : 2026-08-13 11:51:17.51419 
+=============================================================
+
+[1/4] Loading locked signature...
+  Signature: 9 genes (4 up, 5 down)
+  Up   : CDKN3, PTP4A2, PTP4A3, STYXL1 
+  Down : TNS1, DUSP6, CDC14B, EPM2A, DUSP1 
+
+[2/4] Retrieving MSigDB Hallmark collection...
+  Hallmark sets: 50
+  Set size: median 180, range 32-200
+  msigdbr version: 26.1.0
+
+[3/4] Building membership matrix...
+  [SAVED] 16_hallmark_membership_long.csv            (12 rows) -> D:/MS_PHD_work/14_Cancers/Breast_Cancer/Task_A_BRCA/output_hallmark_membership/tables/16_hallmark_membership_long.csv
+  [SAVED] 16_gene_hallmark_counts.csv                (9 rows) -> D:/MS_PHD_work/14_Cancers/Breast_Cancer/Task_A_BRCA/output_hallmark_membership/tables/16_gene_hallmark_counts.csv
+
+  ── Hallmark sets containing each signature gene ──
+   gene direction n_hallmarks
+  CDKN3        Up           3
+  DUSP6      Down           3
+  DUSP1      Down           3
+ PTP4A3        Up           1
+   TNS1      Down           1
+ CDC14B      Down           1
+ PTP4A2        Up           0
+ STYXL1        Up           0
+  EPM2A      Down           0
+
+  Genes in >= 2 hallmark sets: 3 of 9
+  Genes in 0 hallmark sets   : 3
+  [SAVED] 16_hallmark_gene_counts.csv                (12 rows) -> D:/MS_PHD_work/14_Cancers/Breast_Cancer/Task_A_BRCA/output_hallmark_membership/tables/16_hallmark_gene_counts.csv
+
+  ── Hallmark sets containing the most signature genes ──
+          hallmark_label n_signature_genes set_size pct_of_set
+       Androgen Response                 1      101       0.99
+             Coagulation                 1      138       0.72
+              Complement                 1      200       0.50
+             E2f Targets                 1      200       0.50
+          G2m Checkpoint                 1      200       0.50
+         Heme Metabolism                 1      200       0.50
+                 Hypoxia                 1      200       0.50
+       Kras Signaling Up                 1      200       0.50
+              Myogenesis                 1      200       0.50
+         Spermatogenesis                 1      135       0.74
+ Tnfa Signaling Via Nfkb                 1      200       0.50
+          Uv Response Dn                 1      144       0.69
+  [SAVED] 16_hallmark_membership_matrix.csv          (12 rows) -> D:/MS_PHD_work/14_Cancers/Breast_Cancer/Task_A_BRCA/output_hallmark_membership/tables/16_hallmark_membership_matrix.csv
+
+[4/4] Generating figures...
+  [SAVED] Fig_16A_Hallmark_Membership_Tile 
+  [SAVED] Fig_16B_Hallmarks_Per_Gene 
+  [SAVED] 16_HALLMARK_MEMBERSHIP_REPORT.txt
+
+=============================================================
+ OUTPUT MANIFEST
+=============================================================
+
+ TABLES  (D:/MS_PHD_work/14_Cancers/Breast_Cancer/Task_A_BRCA/output_hallmark_membership/tables)
+   [OK]      16_hallmark_membership_matrix.csv
+   [OK]      16_hallmark_membership_long.csv
+   [OK]      16_gene_hallmark_counts.csv
+   [OK]      16_hallmark_gene_counts.csv
+
+ FIGURES  (D:/MS_PHD_work/14_Cancers/Breast_Cancer/Task_A_BRCA/output_hallmark_membership/figures)
+   [OK]      Fig_16A_Hallmark_Membership_Tile.png
+   [OK]      Fig_16B_Hallmarks_Per_Gene.png
+
+ All expected outputs written.
+
+=============================================================
+ 16_hallmark_membership.R COMPLETE
+ Runtime: 0.03 min
+=============================================================
