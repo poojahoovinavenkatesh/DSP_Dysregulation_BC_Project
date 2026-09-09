@@ -1,0 +1,19 @@
+# Raw data — publicly available, see README
+data/
+*.tsv.gz
+*.txt.gz
+*.csv.gz
+
+# Figures — published in the manuscript
+figures/
+output/
+
+# R clutter
+.Rhistory
+.RData
+.Rproj.user/
+*.Rproj
+
+# Windows clutter
+Thumbs.db
+desktop.ini
