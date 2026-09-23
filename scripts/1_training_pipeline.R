@@ -1,11 +1,11 @@
 # =============================================================================
-# Script      : 1_training_pipeline.R
+# Script      : 01_training_pipeline.R
 # Project     : DSP family dysregulation in breast cancer
 # Description : Repeated Nested CV (100 folds), 5-method ensemble feature
 #               selection, 4-tier consensus, 4-model soft-vote ensemble,
 #               Bayesian-optimised XGBoost final model, full SHAP suite.
 # Author      : Pooja Hoovina Venkatesh, Vidya Niranjan, Sumathra Manokaran
-# Date        : 30.08.2026
+# Date        : 23.09.2026
 # Seed        : 42
 # =============================================================================
 # REQUIRED INPUTS (place in data/):
@@ -258,7 +258,8 @@ cv_results <- foreach(
   set.seed(fold_seed + 3)
   bor_g <- tryCatch({ br <- Boruta::Boruta(x = X_tr_fs, y = y_tr, maxRuns = 30, doTrace = 0); Boruta::getSelectedAttributes(br, withTentative = TRUE) }, error = function(e) character(0))
   set.seed(fold_seed + 4)
-  svm_g <- tryCatch({ rc <- caret::rfeControl(functions = caretFuncs, method = "cv", number = 3, allowParallel = FALSE, verbose = FALSE); sz <- unique(c(min(5, ncol(X_tr_fs)), min(10, ncol(X_tr_fs)))); predictors(caret::rfe(X_tr_fs, y_tr, sizes = sz, rfeControl = rc, method = "svmRadial")) }, error = function(e) character(0))
+  svm_g <- tryCatch({ rc <- caret::rfeControl(functions = caretFuncs, method = "cv", number = 3, allowParallel = FALSE, verbose = FALSE); sz <- unique(c(min(5, ncol(X_tr_fs)), min(10, ncol(X_tr_fs)))); predictors(caret::rfe(X_tr_fs, y_tr, sizes = sz, rfeControl = rc, method = "svmRadial")) },
+    error = function(e) { message("[fold ", f, "] SVM-RFE failed: ", conditionMessage(e)); character(0) })  # [FIX 3]
   
   all_fs   <- c(lasso_g, rf_g, xgb_g, bor_g, svm_g)
   gcounts  <- table(all_fs)
@@ -271,10 +272,10 @@ cv_results <- foreach(
   X_tr_f <- X_tr[, con_g, drop = FALSE]; X_te_f <- X_te[, con_g, drop = FALSE]
   ctrl_in <- caret::trainControl(method = "cv", number = CONFIG$inner_folds, classProbs = TRUE, summaryFunction = twoClassSummary, allowParallel = FALSE)
   
-  p_xgb <- tryCatch({ di <- xgboost::xgb.DMatrix(data=as.matrix(X_tr_f), label=y_tr_n, weight=obs_w); mx <- xgboost::xgb.train(params=list(objective="binary:logistic", eval_metric="auc", max_depth=3, eta=0.1, nthread=1), data=di, nrounds=50, verbose=0); predict(mx, xgboost::xgb.DMatrix(data=as.matrix(X_te_f))) }, error = function(e) rep(0.5, nrow(X_te_f)))
-  p_rf <- tryCatch({ m <- caret::train(x=X_tr_f, y=y_tr, method="ranger", trControl=ctrl_in, tuneLength=CONFIG$tune_length, metric="ROC", weights=obs_w); predict(m, X_te_f, type="prob")[,"Tumor"] }, error = function(e) rep(0.5, nrow(X_te_f)))
-  p_en <- tryCatch({ m <- caret::train(x=X_tr_f, y=y_tr, method="glmnet", trControl=ctrl_in, tuneLength=CONFIG$tune_length, metric="ROC", weights=obs_w); predict(m, X_te_f, type="prob")[,"Tumor"] }, error = function(e) rep(0.5, nrow(X_te_f)))
-  p_svm <- tryCatch({ m <- caret::train(x=X_tr_f, y=y_tr, method="svmRadial", trControl=ctrl_in, tuneLength=CONFIG$tune_length, metric="ROC", weights=obs_w); predict(m, X_te_f, type="prob")[,"Tumor"] }, error = function(e) rep(0.5, nrow(X_te_f)))
+  p_xgb <- tryCatch({ di <- xgboost::xgb.DMatrix(data=as.matrix(X_tr_f), label=y_tr_n, weight=obs_w); mx <- xgboost::xgb.train(params=list(objective="binary:logistic", eval_metric="auc", max_depth=3, eta=0.1, nthread=1), data=di, nrounds=50, verbose=0); predict(mx, xgboost::xgb.DMatrix(data=as.matrix(X_te_f))) }, error = function(e) { message("[fold ", f, "] XGB ensemble model failed: ", conditionMessage(e)); rep(0.5, nrow(X_te_f)) })  # [FIX 7]
+  p_rf <- tryCatch({ m <- caret::train(x=X_tr_f, y=y_tr, method="ranger", trControl=ctrl_in, tuneLength=CONFIG$tune_length, metric="ROC", weights=obs_w); predict(m, X_te_f, type="prob")[,"Tumor"] }, error = function(e) { message("[fold ", f, "] RF ensemble model failed: ", conditionMessage(e)); rep(0.5, nrow(X_te_f)) })  # [FIX 7]
+  p_en <- tryCatch({ m <- caret::train(x=X_tr_f, y=y_tr, method="glmnet", trControl=ctrl_in, tuneLength=CONFIG$tune_length, metric="ROC", weights=obs_w); predict(m, X_te_f, type="prob")[,"Tumor"] }, error = function(e) { message("[fold ", f, "] ElasticNet ensemble model failed: ", conditionMessage(e)); rep(0.5, nrow(X_te_f)) })  # [FIX 7]
+  p_svm <- tryCatch({ m <- caret::train(x=X_tr_f, y=y_tr, method="svmRadial", trControl=ctrl_in, tuneLength=CONFIG$tune_length, metric="ROC", weights=obs_w); predict(m, X_te_f, type="prob")[,"Tumor"] }, error = function(e) { message("[fold ", f, "] SVM ensemble model failed: ", conditionMessage(e)); rep(0.5, nrow(X_te_f)) })  # [FIX 7]
   
   prob_ens <- (p_xgb + p_rf + p_en + p_svm) / 4
   
@@ -290,6 +291,9 @@ cv_results <- foreach(
 }
 
 parallel::stopCluster(cl)
+foreach::registerDoSEQ()   # [FIX 1] stopCluster() leaves the dead cluster registered as
+                           # foreach's backend; later %dopar% calls (caret::rfe in the
+                           # UpSet block) would fail with "invalid connection".
 cat("  Parallel CV complete.\n")
 
 err_idx  <- which(sapply(cv_results, inherits, "error"))
@@ -298,6 +302,19 @@ ok_idx   <- which(sapply(cv_results, function(x) is.list(x) && identical(x$Statu
 cat("  Results: Success =", length(ok_idx), "| Errors =", length(err_idx), "\n")
 valid_results <- cv_results[ok_idx]
 if (length(valid_results) == 0) stop("All folds failed.")
+
+# [FIX 2] Persist per-fold feature-selection lists (previously built and discarded)
+fold_fs_lists <- lapply(valid_results, `[[`, "FSLists")
+saveRDS(fold_fs_lists, file.path(dirs$tables, "01_cv_fold_FSLists.rds"))
+cat("  [SAVED] 01_cv_fold_FSLists.rds\n")
+cat("  Per-method contribution across", length(fold_fs_lists), "folds:\n")
+for (m in c("LASSO","RF","XGB","Boruta","SVM")) {
+  n_ok  <- sum(sapply(fold_fs_lists, function(z) length(z[[m]]) > 0))
+  n_gen <- mean(sapply(fold_fs_lists, function(z) length(z[[m]])))
+  cat(sprintf("    %-7s returned genes in %3d/%3d folds | mean %.1f genes/fold%s\n",
+              m, n_ok, length(fold_fs_lists), n_gen,
+              if (n_ok < length(fold_fs_lists)) "  <-- WARNING: silent failures" else ""))
+}
 
 # =============================================================================
 # 4. PERFORMANCE METRICS & NESTED ROC
@@ -368,14 +385,23 @@ u_xgb <- tryCatch({ du <- xgboost::xgb.DMatrix(data=as.matrix(Xb), label=ybn); x
 set.seed(CONFIG$seed+13)
 u_bor <- tryCatch({ Boruta::getSelectedAttributes(Boruta::Boruta(x=Xb, y=up_data$Group, maxRuns=30, doTrace=0), withTentative=TRUE) }, error=function(e) character(0))
 set.seed(CONFIG$seed+14)
-u_svm <- tryCatch({ rc <- caret::rfeControl(functions=caretFuncs, method="cv", number=3, verbose=FALSE); predictors(caret::rfe(Xb, up_data$Group, sizes=c(5,10,15), rfeControl=rc, method="svmRadial")) }, error=function(e) character(0))
+u_svm <- tryCatch({ rc <- caret::rfeControl(functions=caretFuncs, method="cv", number=3, allowParallel=FALSE, verbose=FALSE); predictors(caret::rfe(Xb, up_data$Group, sizes=c(5,10,15), rfeControl=rc, method="svmRadial")) },
+  error=function(e) { cat("  [WARN] UpSet SVM-RFE failed:", conditionMessage(e), "\n"); character(0) })  # [FIX 3, 4]
 
 upset_list <- Filter(function(x) length(x)>0, list(LASSO=u_lasso, RF=u_rf, XGB=u_xgb, Boruta=u_bor, SVM=u_svm))
+# [FIX 5] Never let a method vanish silently
+.dropped <- setdiff(c("LASSO","RF","XGB","Boruta","SVM"), names(upset_list))
+if (length(.dropped) > 0)
+  cat("  [WARN] Returned zero genes, excluded from UpSet:", paste(.dropped, collapse=", "), "\n")
 saveRDS(upset_list, file.path(dirs$tables, "01_upset_gene_lists.rds"))
 
 fs_txt_path <- file.path(dirs$tables, "Feature_Selection_Summary.txt")
 sink(fs_txt_path)
-cat("=============================================================\n 5-METHOD FEATURE SELECTION SUMMARY\n=============================================================\n\n")
+cat(sprintf("=============================================================\n %d-METHOD FEATURE SELECTION SUMMARY\n=============================================================\n\n", length(upset_list)))  # [FIX 6]
+cat(" NOTE: Standalone single-pass analysis on the full cohort (upSample-balanced,\n")
+cat("       no elastic-net pre-filter). This is NOT the feature selection performed\n")
+cat("       inside the 100 CV folds -- see 01_cv_fold_FSLists.rds for that.\n\n")
+if (length(.dropped) > 0) cat(" EXCLUDED (returned zero genes):", paste(.dropped, collapse=", "), "\n\n")
 for (m in names(upset_list)) {
   genes_m <- upset_list[[m]]
   cat(sprintf("Method : %s\nCount  : %d genes selected\nGenes  : %s\n-------------------------------------------------------------\n", m, length(genes_m), paste(gsub("_", "-", genes_m), collapse=", ")))
@@ -410,6 +436,11 @@ saveRDS(preProc_fin, file.path(dirs$models, "final_preProc_scaler.rds"))
 y_fin_n <- as.numeric(master_data$Group == "Tumor")
 pos_w   <- sum(y_fin_n == 0) / sum(y_fin_n == 1)
 dtr_fin <- xgboost::xgb.DMatrix(data = as.matrix(X_fin_sc), label = y_fin_n)
+
+# [FIX 9] Seed immediately before Bayesian optimisation. Without this, bayesOpt's
+#         initial design inherits whatever RNG state upstream code leaves behind,
+#         so unrelated changes earlier in the script alter the chosen hyperparameters.
+set.seed(CONFIG$seed)
 
 scoring_fn <- function(eta, max_depth, subsample, colsample_bytree) {
   cv_r <- xgboost::xgb.cv(params=list(objective="binary:logistic", eval_metric="auc", eta=eta, max_depth=max_depth, subsample=subsample, colsample_bytree=colsample_bytree, scale_pos_weight=pos_w, nthread=1), data=dtr_fin, nfold=5, nrounds=200, early_stopping_rounds=15, verbose=0)
@@ -456,6 +487,7 @@ set.seed(CONFIG$seed)
 diag_ci <- pROC::ci.se(roc_diag, specificities=seq(0,1,by=0.04), conf.level=0.95, method="bootstrap", boot.n=500, quiet=TRUE)
 diag_ci_df <- data.frame(fpr=1-seq(0,1,by=0.04), lower=as.numeric(diag_ci[,1]), upper=as.numeric(diag_ci[,3]))
 
+# [FIX 8] annotate() previously referenced youden_dir (Directional Score, defined later) instead of youden (XGBoost)
 p_diag_roc <- ggplot() + geom_ribbon(data=diag_ci_df, aes(x=fpr, ymin=lower, ymax=upper), fill=COL$tumor, alpha=0.15) + geom_line(data=diag_coords, aes(x=fpr, y=sensitivity), colour=COL$tumor, linewidth=1.2) + geom_abline(slope=1, intercept=0, linetype="dashed", colour="grey50") + geom_point(aes(x=1-youden$specificity, y=youden$sensitivity), colour=COL$tumor, size=3.5, shape=18) +  annotate("text", x=1-youden$specificity+0.03, y=youden$sensitivity-0.05, label=sprintf("Optimal\n(Se=%.2f, Sp=%.2f)", youden$sensitivity, youden$specificity), size=3.2, colour=COL$tumor, hjust=0) + scale_x_continuous(limits=c(0,1), expand=c(0.01,0.01)) + scale_y_continuous(limits=c(0,1), expand=c(0.01,0.01)) + labs(title="XGBoost Diagnostic ROC \u2014 Stable Gene Signature", subtitle=sprintf("AUC = %.4f  (95%% CI: %.4f \u2013 %.4f)", as.numeric(ci_diag[2]), as.numeric(ci_diag[1]), as.numeric(ci_diag[3])), x="1 - Specificity", y="Sensitivity") + theme_publication() + theme(aspect.ratio=1)
 save_figure(p_diag_roc, "Fig03_XGB_Diagnostic_ROC", width=9, height=8.5)
 
@@ -505,10 +537,24 @@ if(length(dir_down_genes) > 0) {
 roc_dir  <- pROC::roc(y_fin_n, dir_scores, levels=c(0,1), direction="<", quiet=TRUE)
 ci_dir   <- pROC::ci.auc(roc_dir, conf.level=0.95)
 
-# Full XGBoost eval for DeLong test comparison
-xgb_probs_full <- predict(final_model, xgboost::xgb.DMatrix(data=as.matrix(X_fin_sc)))
-roc_xgb_full   <- pROC::roc(y_fin_n, xgb_probs_full, levels=c(0,1), direction="<", quiet=TRUE)
-dl_test        <- pROC::roc.test(roc_dir, roc_xgb_full, method="delong")
+# [FIX 10] XGBoost comparator for the DeLong test.
+#   Previously: predict(final_model, X_fin_sc) -- the model scored on the same data it
+#   was trained on (resubstitution). That gives XGBoost an overfitting advantage the
+#   Directional Score cannot have, since the latter fits no parameters beyond the gene
+#   direction signs. The DeLong test then measured overfitting, not a real difference.
+#   Now: roc_diag, the 5-fold cross-validated XGBoost ROC computed above (Fig03).
+#   Set XGB_COMPARATOR <- "resubstitution" to restore the previous behaviour.
+XGB_COMPARATOR <- "cv"   # "cv" (recommended) or "resubstitution"
+
+if (identical(XGB_COMPARATOR, "cv")) {
+  roc_xgb_full <- roc_diag
+  cat("  DeLong comparator: 5-fold cross-validated XGBoost ROC (out-of-fold)\n")
+} else {
+  xgb_probs_full <- predict(final_model, xgboost::xgb.DMatrix(data=as.matrix(X_fin_sc)))
+  roc_xgb_full   <- pROC::roc(y_fin_n, xgb_probs_full, levels=c(0,1), direction="<", quiet=TRUE)
+  cat("  [WARN] DeLong comparator: in-sample (resubstitution) XGBoost ROC -- inflated\n")
+}
+dl_test <- pROC::roc.test(roc_dir, roc_xgb_full, method="delong")
 
 dir_coords <- pROC::coords(roc_dir, "all", ret=c("specificity","sensitivity"), transpose=FALSE) %>% as.data.frame() %>% mutate(fpr=1-specificity)
 youden_dir <- pROC::coords(roc_dir, "best", best.method="youden", ret=c("specificity","sensitivity","threshold"), transpose=FALSE)[1,]
@@ -536,7 +582,7 @@ roc_overlay <- rbind(xgb_coords_full, dir_coords)
 p_roc_overlay <- ggplot(roc_overlay, aes(x=fpr, y=sensitivity, colour=Method, linetype=Method)) +
   geom_line(linewidth=1.1) + geom_abline(slope=1, intercept=0, linetype="dashed", colour="grey50", linewidth=0.5) +
   scale_colour_manual(values=c("XGBoost"=COL$tumor, "Directional Score"="#1B7837")) + scale_linetype_manual(values=c("XGBoost"="solid", "Directional Score"="solid")) +
-  annotate("text", x=0.55, y=0.22, label=sprintf("XGBoost AUC = %.4f \nDirectional  AUC = %.4f\nDeLong p %s", as.numeric(ci_xgb_full[2]), as.numeric(ci_dir[2]), ifelse(dl_test$p.value<0.001,"<0.001",sprintf("=%.4f",dl_test$p.value))), size=3.5, hjust=0, fontface="bold", colour="grey20") +
+  annotate("text", x=0.55, y=0.22, label=sprintf("XGBoost AUC = %.4f (%s)\nDirectional  AUC = %.4f\nDeLong p %s", as.numeric(ci_xgb_full[2]), if (identical(XGB_COMPARATOR,"cv")) "5-fold CV" else "in-sample", as.numeric(ci_dir[2]), ifelse(dl_test$p.value<0.001,"<0.001",sprintf("=%.4f",dl_test$p.value))), size=3.5, hjust=0, fontface="bold", colour="grey20") +
   scale_x_continuous(limits=c(0,1), expand=c(0.01,0.01)) + scale_y_continuous(limits=c(0,1), expand=c(0.01,0.01)) +
   labs(title="XGBoost vs Directional Score", x="1 \u2212 Specificity  (False Positive Rate)", y="Sensitivity  (True Positive Rate)") + theme_publication() + theme(aspect.ratio=1, legend.position=c(0.97,0.05), legend.justification=c(1,0), legend.background=element_rect(fill="white",colour="grey80", linewidth=0.4))
 save_figure(p_roc_overlay, "Fig03C_XGB_vs_Dir_ROC_Overlay", width=9, height=8.5)
